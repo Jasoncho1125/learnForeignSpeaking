@@ -1,0 +1,817 @@
+모든 버전 관련 정보 정리
+============   v1.32   ==========================
+1. 그룹 변경시에 다시 불러올때 그룹 첫번째값을 불러오도록 오류 수정함
+2. hanja 암기박사에서 hanja 인 경우에 표시 폰트를 크게함 
+   - 기존 : 16px,  hanja 인경우  25px로 적용
+3. hanja 인경우에 네이버 한자사전 연동하는 기능 추가함. 
+   - 한자 uri encoding 함
+4. 버전관리 txt파일 추가함
+   - version.txt 파일을 추가해서 version 수정 내역을 정리함. 
+5. 마지막 그룹의 개수를 세는 로직 수정
+   - 마지막 그룹이 나누어 떨어지면 그룹의 개수가 0 으로 표시되는 오류 수정
+
+============   v1.33   ==========================
+1. 화면 폰트를 확대, 축소하는 기능 구현
+  - 폰트설정 버튼을 누르면 중간에 폰트를 설정하는 슬라이더 바가 나타난다. 
+  - 폰 화면에 맞춰서 폰트 크기를 조절한다. 
+  - 폰트값을 폰에 저장하여 다음에 다시 열었을때 그 값을 계속 유지하도록 한다. 
+2. 공부자료에 chapter 칼럼을 추가하고 이를 표시함
+  - 엑셀 파일 만들때 chapter 칼럼 추가 : 실제 chapter 또는 category를 넣어서 만들면 좋음.
+  - 이 chapter 정보는 mp3 파일 표시에서 제일 뒤쪽에 (ch : 3) 형태로 표기됨.
+  - chapter 값이 없으면 표기하지 않음. 
+3. 한국어를 play 할것인지 "PLAY A" 버튼에 반영함
+  - 전체 PLAY 시에만 한국어 play를 할것인지 결정하는 toggle switch 를 구현함.
+  - 초기값은 false이고, 어플 실행중에는 변경된 현재 값이 유지됨. 
+  - "PLAY A" 버튼을 다시 누르면 STOP이 되고, 이때 switch도 사라지게 구현
+  - 한국어 mp3가 존재하지 않는 경우에는 스위치가 on 이더라도 외국어만 play하게 함. 
+4. 외국어를 몇번 play 할것인지 "PLAY A"버튼에 반영함
+  - 외국어 PLAY시에 여러번 반복해서 들을 수 있도록 구현함. 
+5. 본문 p tag 간격 조절 추가
+  - 간격이 너무 넓어서 좀 더 좁게 변경함 
+  - CSS 파일 : --line_height_value : 80%;  으로 조정함. 
+  - 기존 미설정 100% 에서 80% 로 간격 줄임
+
+============   v1.40   ==========================
+1. 최초 로딩시에 폰트값이 0 이 되는 에러 방지
+  - window.addEventListener 에 폰트값이 0 이면 16으로 설정하라는 if문 추가하고
+
+============   v1.41   ==========================
+1. 일부 완료 처리후 마지막 맴버수가 틀리는 오류 수정
+  - findGroupMember() 함수 내용 수정 : finishCountInTotal 을 추가함. 
+    lastGroupMember = (engCountInTotal - finishCountInTotal) % groupDevideNum;
+
+============   v1.42   ==========================
+1. 일본어사전 연동, 중국어 사전 연동 추가
+  - language가 japan, china 일경우에 pronounce 칼럼 정보를 가지고 사전 연동함. 
+  - pronounce에 정보가 없을때에는 사전 연동 안함. 
+2. "PLAY R" 반복청취시 Test 수에 반영함
+  - 한문장을 계속 반복하여 듣을때 기존에는 1회만 Test 한것으로 했으나,
+    반복한 만큼 Count를 올리는 것으로 변경함.
+  - Test수 에 반복할때마다 회수 정보를 수정하여 보여줌. 
+
+============   v1.43   ==========================
+1. 페이지 타이틀을 wordtest.js에서 지정할 수 있도록 옵션값으로 변경함.
+  - wordtest.js 에서 let savePageTitle = "일본어NHK1" 처럼 값을 지정함
+  - 어플 실행시에 무조건 실행되는 아래 함수에 html의 "my_title"을 찾아서 내용 추가
+    window.addEventListener('DOMContentLoaded', function()
+    document.getElementById('my_title').innerHTML = savePageTitle;
+2. 외국어 mp3 Play 간격을 조정하는 슬라이더 적용
+  - 기본값은 1.2배로 설정됨
+  - "PLAY R", "PLAY A"에서 MP3 Pause Ratio를 조정할 수 있는 슬라이더 바를 추가함.
+  - 0.5 ~ 1.5 사이 값을 지정하도록 함. 
+
+============   v1.44   ==========================
+1. 일부 완료 처리후 마지막 맴버수가 틀리는 오류 수정 (v1.41 1번 항목 재수정) 
+  - 그룹 reassing 할때만 lastGroupMember 값 할당하도록 수정
+  - lastGroupMember값을 메모리에 저장하여 관리함. 
+
+============   v1.45   ==========================
+1. 초기화, 그룹조정을 취소했을때 원래대로 유지하도록 함 
+  - 초기화 버튼 loadJsonFromLocal()에 confirm을 추가하여 문의하는 기능 추가
+  - 그룹조정 버튼에서 취소를 누르면 if문으로 체크하여 로직 변경함
+2. 전체,완료 개수 표시 방법 변경
+  - 현재 학습중인 개수를 표시함
+
+============   v1.46   ===========================
+1. 그룹 조정시 팝업창에서  조정할 값 선택하는 기능 구현
+  - 팝업창에서 라디오버튼으로 10, 12, 15, 20 중 값을 선택하도록 함.
+  - html, wordtest.js 파일 모두 수정함. 
+  - css파일에 radio 버튼 간격 조정 추가함
+
+============   v1.47   ===========================
+1. 한 mp3를 반복하는 "PLAY R"에서 "다음", "이전", "완료" 버튼시 기능 개선
+  - 기존에는 곡을 PLAY 중에 이 버튼을 누르면 꼬이는 현상 발생
+  - "다음", "이전", "완료" 처리시 "PLAY R" 버튼이 "STOP" 이면 두번 반복 하도록 if 로직 추가 
+2. js 파일명 변경
+  - wordtest_font.js  ==>  wordtest_setting.js
+3. 한글 자막과 영어 자막을 분리하여 처리 및 터치시 mp3 플레이 연동
+  - GroupNo, 프로그래스 바 영역 div를 누르면 한글만 나오고, 
+    koreaPlay 옵션에 따라 playMp3A() 가 동작함
+  - 하단 div를 터치하면 한글 포함 전체 다 자막이 나오고,
+    playMp3B() 가 동작함  
+4. 폰트설정을 설정으로 변경
+  - 설정을 누르면 "폰트설정"과 "koreaPlay" 설정값을 변경 가능 하도록 수정함
+5. 한글 play 기능 구현
+  - 기존 playMp3() 함수를 playMp3B() 함수로 변경 => 영문만 play 함
+  - playMp3A() 함수 만듬 : 한글 mp3가 존재할 때 한글만 play 함 
+6. 한글 설정을 db에 저장하도록 변경
+  - koreaPlay 변수값을 db에 저장하여 사용 : 한번 변경하면 계속 값 저장함. 
+  - boolean값을 저장할때 true, false 가 텍스트로 저장되므로 복원할때 다시 if문으로 원복해줌.
+    loadLocalStorage() 함수에 if문 추가함. 
+7. p tag 폰트 간격을 더 줄임
+  - css  .p_font 에 margin-top: 0.5em;   margin-bottom: 0.5em;  추가함. 
+  - html touch event를 p tag에서 div에 부여함. 
+8. myForeignTouch 영역에 터치 및 스와이프 이벤트 처리함 
+  - myForeignTouch(Number, mp3, 학습상태표시) 영역을 터치하면 외국어 play
+  - 스와이프하면 왼쪽, 오른쪽에 따라 다음, 이전 곡으로 이동 및 외국어 play
+
+============   v1.50   ===========================
+1. id="myForeignTouch"의 화면 터치 이벤트 수정
+  - Number, mp3 영역을 탭하면 외국어 play, 더블탭하면 암기완료 처리 및 다음곡 재생
+  - 좌우스와이프하면 왼쪽, 오른쪽에 따라 다음, 이전 곡으로 이동 및 외국어 play
+  - 아래 스와이프 : 스크립트 보이기, 위 스와이프 : 스크립트 감추기
+2. id="myForeignTouch"의 색상 추가 
+  - 옅은 노란색 계열로 색상 추가 
+
+============   v1.51   ===========================
+1. 반복재생 "PLAY R" 인 경우에 좌우 SWAP 시 Play 추가 하지 않도록 구현
+  - touch.js 에  if(!isPlaying) 로직을 추가함. 
+
+============   v1.52   ===========================
+1. 그룹 재조정시에 비동기 프로그램으로 처리 함 
+  - 그룹을 다시 재조정할때 promise, async, await 를 이용하도록 구현
+  - 해당 값을 받아온 이후에 프로세스가 진행하도록 구현
+  - async function groupReassign(),  async function getGroupReassignValue() 
+  - 취소버튼을 누르면 수행하지 않음. 
+2. 제일하단 날짜별로 학습 완료 개수를 날짜 역순으로 배치
+  - 날짜가 여러날에 걸쳐서 공부한 경우에 오늘 날짜를 위로 배치하여 쉽게 볼 수 있도록 함
+  - function findDateStudyState()의 studyDateArr.sort() ==> studyDateArr.reverse()
+3. Touch Violation 경고 처리
+  - 경고 : wordtest_touch.js:28 [Violation] Added non-passive event listener to a scroll-blocking 'touchstart' event. Consider marking event handler as 'passive' to make the page more responsive. 
+  - this.element.addEventListener(t, e, { passive: true} )  처럼 뒤쪽에 passive 내용 추가
+  - touchArea.addEventListener('touchstart',  내용 수정함. 
+
+============   v1.60   ===========================
+1. 학습데이터에 CHAPTER의 개념을 도입함 
+  - 학습데이터의 최적은 200개 SET 정도로 생각됨.
+  - 만약 학습 데이터가 800개가 있다고 하면 이를 200개 단위로 잘라서 공부할 필요가 있음
+  - 엑셀파일에 chapter 항목을 추가함(필수값)
+  - 선택한 chapter 기준으로 나눠서 학습하는 기능을 구현함. 
+2. Local Storage 저장 데이터 로직 변경
+  - 기존에 각자 변수별로 저장하던 값을 myChapterList object를 선언하고 여기에 값을 저장함
+  - 총 3개에 모든 정보 저장 : studyData, myChapterList, myChapterInfo
+3. js 파일 합치기 
+  - wordtest_switch.js 파일을 wordtest_settings.js 파일에 합치기
+  - "설정" 의 함수명을 toggleSettings() 으로 변경함. 
+4. 초기화시에 기존 Local Storage 저장소 파일을 모두 지움
+  - removeLocalStorage(); 이 함수를 실행하여 모두 삭제함. 
+5. 화면이 계속 꺼지지 않고 켜지는 기능 적용
+  - 화면 초기 로딩시 requestWakeLock();  함수 호출
+
+============   v1.61   ===========================
+1. next, prev, next_group, perv_group 버튼 누르면 기존 play되던 음원을 중지 시킨다. 
+  - 긴 음원의 경우 계속 play 되는 것 방지함. 
+2. playmp3에서 mp3간 간격 값 range 변경
+  - 기존 0.5초 ~ 1.5초 => 변경 0.0초 ~ 1.5초
+  - 0으로 설정하면 바로 쉼 없이 play 됨
+3. script_a, script_b에 \n 이 있을 경우에 줄바꿈을 웹화면에서도 처리해줌
+  - p tag 에 스타일 추가 : style="white-space: pre-line;"
+  - 아래 참조 : https://januaryman.tistory.com/240
+4. script_a에 정보가 없으면 표시 하지 않는 로직 추가
+  - if (studyData[currStudyDataNum].script_a) 추가함
+  - KOR : undefined 로 표시되는 것 방지 
+
+============   v1.62   ===========================
+1. 한국어 보고/듣고, 외국어를 생각하는 작문모드 추가함.  
+  - 전역변수에 composeMode 추가
+  - 설정에 composeMode 변수 설정하는 모드를 추가함.  
+  - myChapterList에 변수로 저장하여 값이 계속 유지 되도록 함. 
+  - 터치로 좌우 스와이프하면 한국어가 먼저 보이고, 외국어 작문을 하도록 유도함. 
+  - 이때, koreaPlay = true 이면 한국어 play도 같이 해줌. 
+  - 이전그룹, 다음그룹 변경시에도 composeMode를 확인하여 한글자막 보이기를 해줌. 
+2. 그룹당 최소 암기 대상을 2개에서 1개로 변경
+  - 그룹에 마지막 완료처리 가능한 개수를 2개에서 1개로 변경함
+3. 제일위 타이틀에서 Chapter 정보를 푸른색, 볼드, 언더라인 추가
+  - span class 를 이용 => css에 제일 하단에 내용 추가함. 
+  - document.getElementById('study_title').innerHTML = studyTitle 
+    + '<span class="mychaptercolor">' + currChapterName + '</span>';
+4. 그룹조정시 팝업창 리스트 보기 방법 변경
+  - 기존: 모두 한줄에 => 줄바꿔서 보이도록 변경
+5. 터치 이벤트 수정
+  - 더블터치할때 암기 완료 처리 이후 composeMode를 확인한후
+    false 이면 외국어 Play, ture이면 한글 자막만 보이게 함
+  - 더블 터치시 모두 암기 완료 처리가 되면 playMp3B() 가 되지 않도록 함.
+
+============   v1.63   ===========================
+1. 화면에 공부현황 표시하는 Touch 영역 수정  
+  - chapter 정보를 No 뒤쪽에 표시함 
+  - mp3 이름이 길어서 두줄로 표시되는 것 방지.
+  - 전체/완료/학습 을 영어로 변경 : Total/Fin/Stu 로 하여 한줄로 표시함.
+2. 화면을 항상 on 시켜주는 로직 개선
+  - wakeLock.js 파일을 만들어 별도 관리
+  - loadvalue() 와 mp3 play 등에 requestScreenOn() 함수를 호출함. 
+  - wakeLock api를 지원하는 브라우저인 경우에만 호출하도록 함. 
+3. group 관련 함수를 별도 파일로 분리
+  - wordtest_group.js 파일에 그룹 관련 함수를 분리하여 정리함. 
+4. chapter 관련 파일을 한곳에 모아서 정리함.
+  - chapterSelect.js 파일명을 chapterManage.js 파일로 변경
+  - chapter 관련 함수를 모두 이곳에 모음.
+5. 날짜별 학습완료 개수에 chapter제목 추가함. 
+
+============   v1.64   ===========================
+1. Test Count Update 를 별도 함수로 분리하여 처리   
+  - updateTestCount() 함수를 만들어 mp3B가 play될때마다 바로 업데이트하도록 함
+  - 필요한 곳에서 함수 호출하도록 정의 
+2. mp3PlayB() 함수 기능 개선
+  - play중일때에는 play중지, play가 아닐때에는 play 하도록 if문 추가함 
+3. PLAY R 모드 개선
+  - PLAY R 모드에서 이전 다음 누를시 PLAY R 모드를 중지 후 처리하고,
+   다시 PLAY R 모드를 시작하도록하여 꼬이는 거 방지함. 
+  - 이전그룹, 다음그룹을 누를때 PLAY R 모드이면 이를 중지하고 처리하도록 함. 
+
+============   v1.65   ===========================
+1. 전체 play 모드에서 화면 screen on 기능 수정   
+  - 전체 play 시에 requestScreenOn() 호출하는 기능 추가
+2. Group 나누기에 카테고리 추가
+  - 기존에 50, 500 을 추가함.  500인 경우 전체를 하나로 하는 그룹
+  - 전체인 경우에 차량에서 전체를 반복해서 들을 경우 가정함. 
+
+============   v1.66   ===========================
+1. Song Mode에서 이전, 다음 클릭시 스크립트 보이기 옵션 수정   
+  - 전체 play시에 studyLang = "song" 인 경우에 이전, 다음 버튼에서 가사를 항상 보이도록 함
+2. 전체모드 줄바꿈 표시 적용
+  - 전체 모드시에 text에 대해서 '\n' 이 있으면 이를 반영하도록 구현
+  - html 에 이 내용 추가 :  style="white-space: pre-line;
+3. 자막에서 "KOR : " "FOR : " 표시 삭제함. 
+  - showScriptOn, Off 에서 내용 삭제 처리 
+
+============   v1.67   ===========================
+1. studyLang 에 chapter 을 추가함   
+  - chapter인 경우에 항상 script를 보이게 함
+  - 사전은 영어사전에 연결하도록 함 
+2. chapter인 경우 사전 연결을 위한 단어에 underline 안보이게 처리함
+  - generateClickableSentence(sentence) 함수에서 style 추가
+  - if문에서 chapter인 경우 style="text-decoration:none;" 추가함 
+3. forNoSoundLength 값이 0 인 경우 에러처리 수정
+
+============   v1.68   ===========================
+1. 한곡 반복 "PLAY R" 모드에서 터치 오류 수정   
+  - 싱글탭인 경우에 동작하지 않도록 함 : 에러발생 방지 
+2. pronounce, explain 정보의 폰트 색상 변경
+  - 붉은색으로 색상 변경 : style에서 p_font_c 로 별도 분리함. 
+
+============   v1.69   ===========================
+1. chapter 모드에서 한글 해석에 대한 처리 로직 수정   
+  - 기본 play 모드에서 한글 해석을 안보여줌.
+  - 이전,다음 버튼 눌렀을때 한글 해석 안보임
+  - "PLAY R", "PLAY A" 모드에서도 한글 안보여줌
+
+============   v1.70   ===========================
+1. 제일위 타이틀 폰트 크기 적용 클래스 반영   
+  - 폰트 축소, 확대 영향을 받도록 class 를  p_font 로 적용함. 
+2. explain에 줄바꿈이 있는 경우에 그대로 반영하도록 함. 
+  - p tag 에 스타일 추가 : style="white-space: pre-line;"
+3. Tot/Fin/Stu 를 원래 글자로 변경 => Total/Finish/Study
+4. initializeValue() 함수명을 initializeChapter()으로 변경
+5. 북의 학습을 완료하면 currStudyDataNum = undefined; 로 설정
+  - 이후에 값을 저장함. saveLocalStorage(); 수행
+  - 이는 학습 완료시에 초기화를 수행하기 위함. 
+6. myChapterList object의 초기값 변경 
+  - 'currStudyDataNum': undefined, 로 설정함
+  - chapter을 선택했을때 위의 값이 undefined이면 초기화를 수행함. 
+7. 암기 완료시 프로그레스바를 100%로 변경
+  - 암기완료시에 updateProgress(100); 호출함 
+8. Chapter Change시에 lastGroupMemberCount가 꼬이는 문제 버그 수정
+  - Chapter Change 후 저장시에는 saveLocalStorageInChapterChange() 수행하도록 수정
+  - 기존의 lastGroupMemberCount가 복사되어 다른 chapter 에 저장되는 에러 수정
+9. 그룹 나누기에 마지막에 All 추가
+  - 기존 500 으로 되어 있는 마지막 항목을 "All" 로 변경함 
+
+============   v1.71   ===========================
+1. 초기화시에 삭제하는 함수 수정   
+  - removeLocalStorage(); => removeLocalStorage(studySaveName);
+  - 파라미터에 삭제하려는 내용을 명시하여 삭제 진행
+
+============   v1.72   ===========================
+1. currChapterName을 수정하는 경우에 초기화 오류 수정
+  - 초기화시에 currChapterName을 초기화 함
+  - loadJsonFromFile() 함수에 currChapterName = ""; 추가함. 
+
+============   v1.73   ===========================
+1. PLAY A 기능 보완
+  - play 하는 동안에 "완료" 버튼을 누르면 완료 처리 하도록 구현
+  - changeFinishCheck() 에  if문으로 기능 추가함. 
+  - play하는 곡을 현재값과 연동하여 처리함 
+2. PLAY A 시에도 explain 항목을 표시하도록 함. 
+  - html 파일에서 tag 순서 변경
+  - playNextMp3B() 에 explain tag에 내용 추가하는 로직 추가함
+3. PLAY A에서 반복 횟수 변경시 메모리에 변경된 값을 저장
+  - saveLocalStorage(); 에 값을 저장하고, 다시 불러오도록 로직 수정함
+4. PLAY R에서 count 숫자가 맞지 않는거 수정함
+  - mp3 반복 play하는 함수에 updateTestCount(); 추가함. 
+5. 한자인 경우 폰트를 크게함  : 25 => 30
+  - document.getElementById('script_b').style.fontSize = "30px";
+
+============   v1.74   ===========================
+1. 한자인 경우에 사전 링크에 밑줄을 치지 않도록 수정함
+  - play 하는 동안에 "완료" 버튼을 누르면 완료 처리 하도록 구현
+2. 폰트설정에서 hanja인 경우에는 PLAY A 의 폰트 사이즈를 더 크게 함
+  - changeFontSize(value) 에서 hanja if 문을 삽입하여 기본폰트 + 10 으로 처리 
+3. PLAY A에서 폰트를 bold체가 아니도록 함
+  - bold인 경우 한자 두께가 너무 두꺼워서 잘 안보임 
+  - style에서 bold를 제거함
+4. 자막보기에서 한자인 경우 weight 를 bold체가 아니도록 변경함
+  - document.getElementById('script_b').style.fontWeight = "normal";  //이렇게 설정함
+5. PLAY R, PLAY A에서 토글형 옵션 함수를 true/false로 변경하여 오류 수정
+  - togglePlayCount();  ==> showPlayCount(true);
+  - toggleForeignNoSoundLength(); ==> showForeignNoSoundLength(true);
+
+============   v1.75   ===========================
+1. 암기완료 함수 로직 변경
+  - changeFinishCheck() 안에 변수를 사용하지 않음. 
+  - currStudyDataNum 값을 사용하도록 로직 변경함
+2. 더블터치로 암기완료를 하는 경우 로직 수정
+  - 암기 완료 처리후에 다음곡을 자동으로 play하도록 구현함. 
+
+============   v1.77   ===========================
+1. PLAY R, PLAY A에서 오류 수정
+  - 완료 처리했을때 오류 수정함. 
+2. PLAY A에서 중지시에 현재 값이 하나씩 증가하는 문제 수정
+  - playNextMp3B() 함수 수정
+  - intervalTimer = setInterval(updateAudioProgress, 100); 추가함
+  - 0.1초마다 play 진행사항을 체크하여 95% 이상 mp3 play가 되었을때에만 진행 되도록 구현함
+3. PLAY G 표기 수정 ==> PLAY A (All 의미)
+
+============   v1.78   ===========================
+1. PLAY A에서 한자 이외에는 폰트를 bold로 함
+  - Style에서 .p_font_a_large  값에 font-weight: bold; 로 지정함 
+
+============   v1.80   ===========================
+1. PLAY A에서 pronounce 폰트를 작고, 붉은색으로 변경함. 
+  - 중국어에서 발음 폰트가 너무 크게 보임
+  - <p class="p_font_c" id="pronounce_large" style="white-space: pre-line;"></p>
+2. PLAY A의 로직을 변경함 
+  - const playGroupMp3s = async ()  함수 다시 설계
+  - const sleepMiliSecond = (timeToDelay)  promise 로 다시 만듬
+  - const playMp3 = async (songPath)  mp3 play 하는 함수 재설계함. 
+3. 한글 파일이 없는 경우 처리 : 아직 개발 못함
+  - javascript에서는 파일의 존재 여부를 직접적으로 파악 불가함
+  - jquery를 사용해서 해야 하나 잘 동작 안함 : 추가 개발 필요
+4. PLAY A에서 한글 폰트 사이즈 줄임
+  - CSS에서 외국어와 한글 폰트를 별도로 구분함. 
+  - 설정에서 font_p_font_a_large = parseInt(value) + 2; 로 설정
+5. PLAY A 실행시 버튼 2개로 변경됨
+  - html 파일에서 "완료", "PLAY A" 버튼만 남기고 나머지는 안보이게 처리함. 
+
+============   v1.81   ===========================
+1. PLAY A에서 play 길이 조절. 
+  - mp3 길이가 2초 이하인 경우에는 묶음 간격을 2초로 조정하는 로직 추가 
+  - const playMp3 = async (songPath) 에서 if 문 추가함. 
+2. PLAY A에서 한글 MP3 Play 하는 경우에 자막 보이기 조정
+  - 한글 mp3 play 하는 경우에는 외국어 script가 안보이고 한글만 보이게 조정함.
+  - showPlayGroupDiscriptionOff() // 기존 자막을 모두 없애라. 
+    showPlayGroupDiscriptionKor(); // 한국어 자막만 보여라. 
+3. PLAY A에서 기존에 자막이 있는 경우에 안보이게 처리함.
+  - PLAY A 버튼 누르면 showScriptOff(); 를 먼저 실행하도록 함. 
+
+============   v1.82  ===========================
+1. Group Count가 null 이 되는 경우 에러 처리
+  - 중복 사용한 findTotalGroupCount() 함수를 삭제
+  - groupCountinChapter() 이 함수만 사용함. 
+  - loadValue() 함수에 if(isNaN(totalGroupCount)) 추가하여 추가 검사함. 
+2. Group Play 를 하는 경우에도 Play Count가 올라가게 수정
+  - const playGroupMp3s = async ()  함수에 studyData[currStudyDataNum].test_count++; 추가함
+
+============   v1.83  ===========================
+1. 마우스 우클릭 및 Drag 방지 
+  - 터치를 하다가 드래그 되는 현상 방지
+  - <body> 에 아래 내용 추가
+  - <body oncontextmenu="return false" ondragstart="return false" onselectstart="return false">
+2. Play All 에서 현재값을 메모리에 저장하기
+  - Play All 중 중지하고 나중에 다시 시작하면 처음부터 반복하는 것 방지
+  - const playGroupMp3s = async () 함수 마지막에 saveLocalStorageInChapterChange(); 호출하여 저장
+
+============   v1.86  ===========================
+1. 각종 설명 추가 
+  - 함수등에 설명 추가
+2. toggleAllPlayStop() 에 clearTimeout(timerVar2); 3, 4  추가함
+3. 그룹조정 팝업에 현재 북의 Study 대상이 몇개인지 정보 표출
+  - <p> 현재 Chapter의 미완료 개수 : ${(yesNoCountInChapter - yesCountInChapter)}</p>
+4. Chapter인 경우 스크립트 하단에 폰트 조정 버튼 추가
+  - 자막이 on 되는 경우 폰트 조정 버튼이 나타나게 함
+  - chapterFontPlus(), chapterFontMinus() 함수 추가
+5. Chapter인 경우 스크립트 하단에 번역 버튼 추가
+  - 파파고번역, 구글 번역 버튼 추가함
+  - function transPapago(), function transGoogle()
+  - css에서 .button4ea 속성 추가 : 한줄에 4개 버튼 배열 처리 
+6. 영어 자막의 줄간격을 좀 더 넓게 조절 
+  - style="white-space: pre-line;line-height:1.5"
+7. 초기화를 3가지로 구분하여 수행 : 1.전체초기화, 2.해당북만 초기화, 3.해당 그룹초기화
+  - wordtest_initialize.js 파일 추가
+8. 책(Chapter)인 경우에 audio controller 추가함
+  - 책은 mp3 내용이 길어서 중간에 play 하는 경우가 필요함
+  - html에 audiocontroller 추가함 
+
+============   v1.87  ===========================
+1. 폰트 설정 변경 : settings.js 파일 
+  - 테블릿 화면 고려하여 폰트 설정 Range 변경 :  14 ~ 26 => 10 ~ 30
+  - CSS 파일에 class .settings 추가함 
+  - index.html에서 chapter script 폰트 사이즈를 defaultfont + 4 로 수정함
+  
+============   v1.88  ===========================
+1. chapter인 경우에 script 폰트를 별도로 지정하고 이를 메모리에 저장함. 
+  - wordtest.js 파일에 전용 폰트값 설정 let script_b_Font = 20;
+  - showScriptOn()에서 if (studyLang == 'chapter') 인경우 폰트 별도 설정함
+    만약 null, 0인 경우  if(!script_b_Font) => default 값 지어하여 에러 처리 
+  - 폰트 +, - 버튼 누를때 chapterFontPlus(), chapterFontMinus()를 사용하여 폰트 조정함
+  - saveLocalStorage() 에 myChapterList[currChapterName].script_b_Font = script_b_Font; 추가함
+  - loadLocalStorage() 에 script_b_Font = myChapterList[currChapterName].script_b_Font; 추가함
+2. chapter의 경우 하단에 "복사" 버튼 추가함 => 챗GPT에 붙여넣기 용으로
+  - index.html에 "복사" 버튼 추가
+  - wordtest.js에 function copyClipboard() 추가 => 클립보드에 script_b 복사
+3. 하단의 폰트설정, 번역, 복사 버튼 색상 변경
+
+============   v1.90  ===========================
+1. 하단 [Chapter 현황] 정보에 Chapter별로 공부 완료한 날짜 정보를 추가함 
+  - let chapterStudyFinishDate = ""; 이런 전역 변수를 만들어서 사용함. 
+  - 로컬 메모리에 myChapterList[currChapterName].finishDates = chapterStudyFinishDate; 형태로 저장함. 
+2. 현재 chapter의 암기를 완료하면 북 초기화 바로 진행
+  - chapter을 초기화하고, 바로 그룹조정을 시행함
+  - 완료된 상태에서 어플 종료하고 다시 시작하면 상단이 안보이는 오류 수정됨.
+3. totalGroupCount가 undefined 되는 오류 수정
+4. 그룹조정시에 현재 남은 암기 개수가 몇개인지 구현 내용 삭제함.
+  - 에러 원인을 찾기가 어려움. 
+
+============   v1.92  ===========================
+1. 그룹 나누기에서 50개 항목은 제외함. 
+2. PLAY A 기능 수정
+  - 완료 처리시 오류가 나는 것 수정함.
+  - toggleAllStopPlay() 함수를 분리하여 toggleAllStop(), toggleAllPlay()로 처리함
+  - 완료버튼 누르면 0.5초 정도 쉬었다가 play 되게 함. 
+  - changeFinishCheck()에서 그룹이 1개인 경우 오류 수정
+  - 최종 그룹1개만 있을때, 마지막 1개도 계속 반복하도록 수정, 완료 처리도 가능하게 함. 
+    : playGroupMp3s = async () 함수 수정 함. 
+3. Chapter 변경시 Chapter이 17개 이상이면 "선택", "취소" 버튼이 반복되게 함. 
+  - selectChapter() 함수내 html 변경함. 
+4. 그룹조정시에 현재 북의 남은 대상 개수 표시
+  - getGroupReassignValue() 함수에 숫자 세는 기능 재구현
+5. 암기완료시 학습완료일 표시 스타일 변경
+  - updateFinishDateInChapter() 에서 수정처리
+  - 기존 : 07-09 => 7-9 로 표기함. 자리 적게 차지하게 변경
+
+============   v1.93  ===========================
+1. 실행시 화면이 sleep mode로 들어가는 것 방지코드 추가
+  - index.html 하단에 nosleep.js 및 코드 추가함 
+  - 기존의 requestScreenOn() 함수 모두 호출하지 않도록 변경함. 
+2. 노란색 정보 표출 방식 변경
+  - Test Count를 mp3 파일명 뒤쪽으로 이동함
+3. Chapter 초기화시에 test_count값을 그대로 유지함. 
+  - 기존에는 Chapter 초기화시에 test_count로 0으로 설정했으나 그대로 둠
+  - 이 mp3를 얼마나 들었는지 보기 위함. 
+  - 전체 초기화시에는 정보가 삭제됨(기존과 동일)
+
+============   v2.02  ===========================
+1. saveLocalStorageInChapterChange()을 더이상 사용 안함
+  - 중복으로 보여서 saveLocalStorage()로 모두 변경함.
+2. 전체적인 프로그램 구성 최적화 진행
+  - 암기 완료 후 Chapter 자동 초기화 하지 않음
+  - 메모리 저장하는 항목 재조정함 
+  - 공통항목은 myChapterInfo에 값으로 저장함
+  - 함수명, 변수명 최적화 진행
+  - 초기화에서 모듈 초기화는 삭제함
+  - 불필요한 로직 삭제 
+3. 그룹 분할시 최소값 변경
+  - 최소값 8을 추가함.  default 값은 10으로 유지 
+4. 학습 DB 자동 업데이트 기능 추가함
+  - 기존과 다른 json 파일이 있는 경우에 자동으로 업데이트 하고 alert 표시함. 
+  - num, mp3b가 일치하는 경우에만 업데이트 하도록 구현함. 
+5. 화면 잠김 방지하는 requestScreenOn() 을 미사용으로 변경
+  - index.html에서 wordtest_wakeLock.js 파일 제외 시킴
+6. play수와 암기 완료 수를 날짜별로 내림차순 표시함
+  - 별도의 js 파일 만들어 구현 : wordtest_studycount.js
+  - myChapterInfo 에 studyCountInDay, studyFinishCountInDay 정보 추가
+  - 최근 7일간 데이터만 출력 하도록 함. 
+7. 최초 실행시 play수, 암기완료수를 날짜별로 표시하도록 구현
+  - window.addEventListener('DOMContentLoaded', function ()  에  updateStudyCountInfo(); 을 추가함. 
+8. PLAY A시 "다음그룹" "그룹모음" 버튼 추가함
+  - "다음그룹"은 PLAY A 중에 다음 그룹으로 이동
+  - "그룹모음"은 현재 학습 Chapter의 전체 대상을 하나의 그룹으로 통합하여 다시 PLAY A 시작
+
+============   v2.03  ===========================
+1. PLAY A 의 버튼 4개 간격 재배치 
+  - 위아래 버튼 간격을 더 벌림, index.html에 아래 div 추가함. 
+  - <div style="height: 5px;"></div> <!-- 간격 추가 -->
+2. noSleep 함수를 PLAY R, PLAY A에 적용함
+  - 각 버튼을 누를때마다 1회씩 noSleep.enable(); 함수 호출 하도록 함. 
+3. 그룹 변경시 함수를 하나로 통합처리하도록 변경함. 
+  - wordtest_group.js에서 여러 그룹을 하나로 합치는 경우 함수 개선
+  - function groupReassign(devideNum) => 와 같이 인수가 있으면 인수값처리하도록 if문 추가 
+4. Chapter을 선택할때, 각 Chapter별로 공부 완료한 횟수를 표시하도록 구현함
+  - chapterManage.js 에  function countFinishDates(chapter) 함수 추가
+  - selectChapter() 함수에 표시 기능 보완
+5. Chapter을 선택할때, 선택,취소를 별도 팝업으로 처리함. 
+  - 기존에는 17개마다 중간에 선택, 취소 버튼을 두었으나,
+    원하는 Chapter을 선택하면 팝업창으로 선택, 취소를 하도록 구현함. 
+6. Chapter을 선택할때, Chapter별 색상을 공부 숫자에 따라 표시함
+  - chapterManage.js에서 countFinishDates(chapter) 개수에 따라서 label 색상 변경함
+    공부횟수 1회 : green, 2회 : blue,  3회이상 red 설정
+7. btnPlayStop 명칭 변경
+  - 모든 코드에서 btnPlayStop => btnPlayRepeat로 변경함.
+8. btnPlay 명칭 변경
+  - 모든 코드에서 btnPlay => btnPlayOne 으로 변경함. 
+9. play중에 터치를 하게되면 암기완료 되는 오류 수정함. 
+  - 1회 play중에는 터치가 동작하지 않도록 함. 
+10. 하단 Chapter 현황에 색상으로 표시하도록 구현함. 
+  - 1회 완료시 DarkCyan, 2회 완료시 blue, 3회 이상은 red로 표시하여 가독성 향상
+
+============   v2.04  ===========================
+1. 그룹을 나누는 옵션값이 변경되면 그 값이 저장되게 한다.
+  - 기존에는 그룹 나누는 디폴트 옵션값을 '10'으로 고정했으나, 변경된 값으로 유지되게 함.
+  - chapterManage.js  myChapterInfo에 'defaultDevideNum' : defaultDevideNum,  값 추가함.
+  - 이 값을 저장하게 로직 변경함. 
+  - group.js 에서 이 값을 기준으로 check box에 default 체크가 되게 변경함. 
+
+============   v2.05  ===========================
+1. 노락색 터치 영역을 터치하여 위아래로 스와이프 할 때, html 페이지 전체가 안움직이게 수정
+  - touch.js 에 event.preventDefault(); 를 지정함. 
+
+============   v2.06  ===========================
+1. 한자 폰트를 default 폰트에 비례해서 커지게 변경함. 
+  - 한자인 경우에 폰트 사이즈를 일반(16px)보다 20포인트 크게 함. 
+
+============   v2.07  ===========================
+1. 기본 설정 파일을 분리함 
+  - wordtest.js => wordtest_0.js 파일과 wordtest_basic.js 로 분리
+  - wordtest_0.js 파일에 기본적인 학습 정보 저장
+2. playmp3.js 에서 PLAY A에서 한글파일 존재 여부 체크 프로세스 추가함.
+  - if(studyData[0].mp3a === undefined){} 로직 추가함. 
+  - 첫번째 파일의 DB에 mp3a 파일의 존재 여부로 판단함. 
+3. playmp3.js 에서 그룹 play 시에 2번째 파일 건너 뛰는 오류 수정
+  - for문을 while 문으로 수정함 
+4. 초기화 버튼 클릭시 default 변경
+  - default를 2.현재 Chapter 초기화 로 변경함. 
+
+============   v2.10  ===========================
+1. 암기대상에서 "삭제" 기능을 추가함
+  - "삭제"를 누르면 암기대상에서 더이상 나오지 않도록 변경함
+  - finish 값을 "delete"로 설정함
+  - 초기화 옵션에서도 1,2,3 으로 분리하여 2번 선택시에는 "삭제"를 제외하고 초기화 함
+  - 충분히 암기 완료하여 더이상 암기가 필요없을 경우에 삭제 처리함. 
+  - 화면에는 "Delete", "Del"로 표시함. 
+2. Chapter 현황 출력시 칼라 표시 변경
+  - day01 : 16/10/2  ==> 이 부분은 검정색으로 나오게 변경함. 
+
+============   v2.15  ===========================
+1. 암기 언어에 korea 추가함
+  - korea 는 한국어 시험을 위한 설정임
+2. 암기 정보에 이미지 파일 추가함
+  - div에 이미지 영역 추가
+  - image load를 위한 모듈 추가 : wordtest_image.js 
+  - json 정보에 이미지가 있는 경우 이미지가 나오도록 구현함
+
+============   v2.16  ===========================
+1. 북 선택시 정보 출력 내용 변경
+  - 현재 모든 Chapter의 암기 완료 회수, 남은 대상 수 표시해 줌 
+  - 많이 남은 Chapter을 선택하여 집중적으로 학습하도록 함. 
+
+============   v2.17  ===========================
+1. 하단 Chapter 현황에서 날짜 표시하는 방법 변경함.
+  - 공부를 여러 일차에 거쳐서 하는 경우 날짜가 모두 붉은색으로 되어 있어서 보기 힘듬. 
+  - 오늘 공부한 날짜는 검은색 배경에 흰색글짜로 보이게 해서 눈에 잘 띄게 함. 
+2. 날짜 색상 변경함
+  - 기존 1회, 2회, 3회 기준으로 색상 변경
+  - 변경 1회~2회, 3회~4회, 5회이상 으로 날짜의 색상이 변경되게 함. 
+
+============   v2.18  ===========================
+1. "다음 북" 기능 추가함. 
+  - "다음 북"을 선택하면 다음 Chapter으로 이동함. 
+  - 만약 이미 암기 완료 상태이면, Group을 1로해서 자동 초기화 함(암기제외는 유지)
+  - 각 chapter에 대해서 남은 개수가 적을때 집중적으로 쉽게 공부하기 위함. 
+2. Mp3 Pause Ratio 를 변경함
+  - 기존 : 0 ~ 1.5
+  - 변경 : 0 ~ 2.0
+3. 암기제외 처리시 다시한번 확인하는 프로세스 삭제함. 
+  - changeFinishCheck(param) 에서 파라미터 체크하는 프로세스 삭제
+  - 귀찮게 계속 물어 보지 않게 함. 
+
+============   v2.19  ===========================
+1. "이전 북" 기능 추가함. 
+  - "이전 북"을 선택하면 이전 Chapter으로 이동함. 
+  - 만약 이미 암기 완료 상태이면, Group을 1로해서 자동 초기화 함(암기제외는 유지)
+  - 각 chapter에 대해서 남은 개수가 적을때 집중적으로 쉽게 공부하기 위함.
+2. "이전 북", "다음 북"에 더블 터치 기능 구현
+  - 더블터치를 하면 해당북의 데이터를 암기제외를 포함해서 모두 초기화 함. 
+
+============   v2.20  ===========================
+1. 책인 경우에 하단의 AI 번역기 추가함. 
+  - 버튼에 "AI번역" 버튼 추가함 : 이걸 누르면 AI LLM API를 통한 번역이 됨. 
+  - AI 번역을 위한 wordtest_llm.js 파일을 추가함. 
+  - 호출시 파라미터 값에 "gpt", "pplx" 를 선택하여 보내면 됨. 
+2. 화면에 필요한 정보를 노출하는 하단 팝업창 표출 추가함. 
+  - 화면하단 중앙에 default로 2초 있다가 사라지게 함. 
+  - basic.js에 showPopup(message, duration = 2000) 함수 추가함 
+  - CSS 파일에  .popup 추가함 
+  - index.html에 팝업 위한 div 추가함 
+3. "PLAY A" 기능 보완
+  - 학습을 완료한 상태에서 PLAY A를 누르면 초기화 선택 옵션창 뜸
+  - 확인 누르면 암기완료는 제외한 초기화 수행하고 PLAY A 모드 진입함 
+4. Sleep Mode 기능 추가함
+  - setting.js 에 sleepMode(param) 함수를 추가함. 
+  - 화면에 sleepmode 남은 시간이 표시되게 함. 
+  - 'STOP'을 누르면 sleep mode도 자동 종료됨
+  - index.html에 남은 시간을 표시하는 <p> tag 추가함. 
+  - sleepmode인 경우에는 mp3 play count를 update하지 않도록 설정함. 
+    (자고있을 경우에는 의도적인 공부가 아니므로 제외함)
+
+============   v2.21  ===========================
+1. showPopup() 순서 변경
+  - llm 번역 요청시 llm 번역보다 showPopup()이 먼저 나오게 함. 
+2. Play A시에 "완료", "삭제" 버튼 두께를 두껍게 변경
+  - .button2ea에서 padding 값 변경함
+3. Setting시에 위아래 간격 줄임
+4. button2th를 button2ea로 용어 변경함
+5. chapter 암기 완료시 암기 완료 메시지 표출 방식 변경
+  - 기존 : alert로 표시하여 확인 버튼 눌러야 함. 
+  - 변경 : script_a 에 표시하여 버튼 누르지 않아도 되게 함.
+6. 사전찾기시 단어에 문장부호 있는것 제거하고 찾기 
+  - dictionary.js에 const cleanWord = word.replace(/[,'"?!.]/g, ''); 추가함
+
+============   v2.22  ===========================
+1. AI번역기를 setting에 넣음. 
+  - NO, GPT, PPLX 중 선택할 수 있게 함.
+  - chapter인 경우에는 default로 gtp 설정함. 
+  - english인 경우에는 default를 'no'로 설정함. 
+2. 단어 클릭시 쌍따옴표 단어 오류 수정
+  - 쌍따옴표 단어는 클릭으로 사전 연동이 안되는 오류 수정함
+  - dictionary 로직 수정
+3. 슬립모드에서 최상위 버튼을 "이전 북", "다음 북"으로 수정함
+  - 슬립모드로 들어가면 "완료", "삭제" 버튼 대신에 "이전 북", "다음 북" 이 나오도록 수정
+  - button 을 2개 추가하여 sleep mode에서만 보이게 함. 
+  - 더블클릭하면 대상북을 모두 초기화하여 재생하게 됨
+ 
+============   v2.23  ===========================
+1. default AI 설정 및 AI번역기 버튼줄 보이기 수정
+  - aiTranslator = "gpt"; 로 설정함. 
+  - chapter이 아니더라도 항상 보이도록 수정함.
+2. 자막 보이기 연동
+  - 자막 보이기 하면 번역기 보이게 함
+  - 자막 안보이기 하면 번역기 안보이게 함
+  - "PLAY A" 하면 번역기 안보이게 함
+
+============   v2.26  ===========================
+1. 사전 연결 underline 설정 수정
+  - 영어인 경우에 단어 밑에 underline 넣는 것을 삭제함. 
+2. Total 표시 재정의
+  - 기존 : Total => 암기 후 남은 대상
+  - 변경 : Total => 전체 개수(삭제포함)
+  - Left 추가 : 암기하고 남은 대상 수 
+  - 화면 표시 현황 변경 : Total/Delete/Finish/Left
+3. 전체 Chapter 을 하나의 Chapter으로 통합하는 기능 추가
+  - Chapter이 여러개인 경우 삭제하고 남은 것들을 모아서 암기하기 위해 Chapter을 하나로 합치는 기능 구현
+  - 초기화 버튼 4번 메뉴에 기능 구현
+  - 원복하는 기능은 없음 => 초기화 1번으로 완전 초기화 필요함. 
+4. 현재 Chapter을 초기화하는 기능 추가
+  - "초기화" 누르면 5번 현재 Group 초기화(암기제외 유지) 옵션 나옴
+  - 암기 제외는 유지하고 현재의 그룹을 초기화 해줌.
+  - 6번 누르면 전체 Group 초기화(암기제외 유지) 옵션 나옴
+
+============   v2.27  ===========================
+1. 모두 완료, 삭제 된 상태에서 계속 "완료", "삭제" 버튼 누를때 오류 수정
+  - changeToYes(), changeToDelete() 함수에 countNoInChapter 개수가 0 이면 초기화 후 사용하라고 안내함. 
+2. "이전 북", "다음 북" 버튼 선택시 모두 삭제 완료된 chapter이면 에러 발생하는 문제 수정
+  - 선택 chapter의 삭제 개수가 chapter의 원래 개수와 동일하면 팝업 띄우고 정료하게 수정
+  - 대상함수 nextChapter(), prebChapter() 함수 수정함
+3. chapter이 하나인 경우에 "이전 북", "다음 북" 버튼 선택시 팝업 멘트 나오게 수정
+  - nextChapter(), prebChapter() 함수에서 chapter 개수 체크하는 로직 추가함.
+
+============   v2.28  ===========================
+1. PLAY A 시에 버튼 위치 변경
+  - 왼손으로 사용시 편리성 증대 위해 "삭제"를 왼쪽에, "완료"를 오른쪽에 배치함
+  
+============   v2.32  ===========================
+1. mp3 재생시 미리 fetch로 받아와서 안정적으로 재생되게 구현함
+  - playmp3.js에 loadAudio() 함수를 추가하여, 미리 다운로드 받을 수 있도록 구현함.
+
+============   v2.33  ===========================
+1. 스페인어 구현
+  - 스페인어 사전 검색 기능 구현
+  - 스페인어의 사전에서 ¿¡ 물음표, 느낌표 삭제하고 사전 검색하도록 구현
+2. 스페인어 추가에 따라 LLM 기능 수정
+  - english => foreign language 로 변경함
+
+============   v2.34  ===========================
+1. mp3 로드에 실패하면 한번도 시도하도록 한다. 
+  - loadAudio 함수에 retryCount를 추가하여 실패하면 1초 후에 한번도 시도하도록 로직 수정함. 
+2. Group Play시에 while 문에 if 비교문 추가하여 종료 로직 보완
+  - const playGroupMp3s 함수의 while 문에 if 문 추가함. 
+
+============   v2.35  ===========================
+1. play A에서 완료, 삭제 위치를 변경함. 
+  - index.html 에서 위치 변경함
+
+============   v2.36  ===========================
+1. play A에서 외국어 먼저 play 기능 구현
+  - 설정에서 foreign First 설정하는 기능 구현
+  - Foreign First 를 설정하면 외국어 발음을 먼저하고, 이후에 한글을 읽도록 함. 
+2. PLAY A에서 explain 값이 있으면 표출하도록 수정
+  - const playGroupMp3s = async () 에서 showPlayGroupDiscriptionKor(); ==> showPlayGroupDiscription(); 로 변경함
+
+============   v2.37  ===========================
+1. playmp3.js 파일을 재구성함함
+  - mp3 load시에 안정적으로 다운로드하여 play하도록 구현함
+  - blob 기능을 사용하고, mp3 종료후 해제함
+  - 네트웍 상태를 체크하여 문제가 있으면 다시 처리하도록 구현함.
+
+============   v2.38  ===========================
+1. playmp3 오류 수정
+  - play 버튼 누르고, 다시 누르면 종료되어야 하는데, 다시 play되는 현상 수정
+2. pplx api 호출 에러 수정
+  - model: "sonar" 로 변경함 
+3. 모두 암기했을때 코멘트 수정
+  - 암기 제외한 개수도 알려주도록 수정함. 
+
+============   v2.39  ===========================
+1. 설정에 script 보이기 설정값 추가함
+  - Show Script 를 on 하면 이전 다음에서 script를 보여주고,
+  - Show Script 를 off 하면 이전, 다음에서 script를 안보여줌.
+2. 변수명을 이름에 맞게 재조정함. 
+3. 함수명을 이름에 맞게 재조정함.
+4. group에 1개만 있더라도 완료, 삭제제 처리하도록 수정함.
+  - 기존에는 group에 최소 1개 이상 있도록 했으나 모두 암기 처리할 수 있도록 로직 변경함
+5. "완료" 버튼을 롱클릭하면 해당 group 을 모두 일괄 완료처리함
+  - 듣기 위주로 듣다가, 전부 다 듣고 나서 일괄 완료 처리할때 사용
+
+============   v2.40  ===========================
+1. 완료 버튼을 길게 눌렀을때 모두 완료 처리 수정
+  - chapter의 맨 처음에서 완료 버튼을 길게 누르면 되는데, 중간에 완료 버튼 길게 누르면 안되는 버그 수정
+2. 값을 load할때 showScriptMode 값을 참조하여 스크립트 보이기/안보이기 설정
+  - loadValue시에 위의 mode값을 참조하도록 함. 
+
+============   v2.41  ===========================
+1. nextChapter, prebChapter 함수 기능 변경
+  - 위 두 함수 호출시 암기 대상이 0개 이면 암기 제외를 빼고 자동으로 초기화 함 
+
+============   v2.42  ===========================
+1. 노란색 더블 터치시 자동 play 기능 추가
+  - 노란색 더블 클릭하면 완료 처리만 되었는데, 완료 처리 이후 현재 곡을 0.5초 후에 play 하도록 기능 추가함. 
+
+============   v2.43  ===========================
+1. 옵션 설정에 mp3 play 안하기 추가함 
+  - PLAY 모드(1개씩 PLAY하는 모드)에서 설정값에 따라 Play 안하고 자막만 보기 기능 구현
+  - 설정에 "Foreign mp3 Play" 옵션을 추가하고, default는 true로 설정함함
+2. 옵션 설정 자막보기를 제일 위로 올리고, default를 true로 설정함
+  - 기본적으로 자막 보기가 나오게 설정함 : Show Script 의 Default를 on으로 설정함함
+3. 그룹조정에서 최소 단위를 6개로 할 수 있도록 함.
+  - 완전히 모르는 외국어는 6개까지 개수를 줄여서 훈련 가능하게 구현함
+
+============   v2.44  ===========================
+1. 초기화 옵션에 원래 Chapter으로 돌아가기 추가함. 
+  - 하나의 Chapter으로 합친 이후에 다시 복귀하는 기능 추가함. 
+  - 초기화 버튼시에 4번을 실행한 이후에 다시 5번을 실행하면 원래 Chapter 정보로 돌아감.
+  - 기존에 암기했던 날짜 정보는 삭제됨. 
+2. 일부 playmp3.js 로직 보완
+  - timerVar1 을 전역 변수로 선언
+
+============   v2.45  ===========================
+1. 설정에서 문구 변경경 
+  - Korea Play => Korea mp3 Play 로 변경함. 
+
+============   v2.46  ===========================
+1. 이미지 파일에 확장자 없어도 jpg 확장자 붙이도록 변경함.  
+  - function showImage(src) 함수를 수정함. 
+
+============   v2.47  ===========================
+1. 설정에 한국어 자막 보이기 스위치 추가함함 
+  - let showScriptModeKor; 변수 정의 -> basic.js 에 추가 
+  - setting.js 에 스위치 추가
+  - save값으로 설정값 관리함. 
+2. 한국어 자막 함수 변경
+  - showKorScriptOn(), showKorScriptOff() 함수 생성
+3. Play A 에서도 한국어 자막 보이기 동작하게 수정
+  - showPlayGroupDiscription() 함수에 if 문 추가함
+4. 설정에서 폰트 크기 변경시 하단 버튼 5개 폰트 사이즈 변경 기능 적용
+  - 기존에 적용이 안되었는데, 같이 증가, 감소 하도록 적용함. 
+5. 일반 보기 모드에서 외국어와 한국어 위치를 변경함
+  - html에서 외국어를 위로 오게 하고, 한국어를 나중에 오도록 변경함. 
+
+============   v2.48  ===========================
+1. 자막을 스와이프 하여 좌,우로 넘기기 기능 구현현
+  - html에 자막 영역을 div로 지정
+  - touch.js 에 좌우 스와이프 반영영
+2. AI 번역시 기존 번역과 구분함
+  - [[ AI 번역 ]] 이라고 구분함
+3. 터치로 mp3를 빠르게 넘길때 여러 mp3가 동시에 호출되는 기능 수정
+  - playmp3.js 내용 수정
+
+============   v2.49  ===========================
+1. AI 번역 색상 변경
+  - 검정에서 red로 변경함
+2. 파파고, 구글 번역 삭제함
+
+============   v2.50  ===========================
+1. PLAY 버튼 에러 수정
+  - 한번 누르면 toggle 이 되어야 하는데 안되고 있음
+  - toggle 이 되도록 touch 와 동일한 skim으로 별도 함수 만들어서 처리 함. 
+
+============   v2.51  ===========================
+1. PLAY A 버튼 기능 고도화
+  - 여러 mp3를 순차적으로 play할때 다음 mp3를 미리 다운로드 하는 사전 로딩 기능 구현
+
+============   v2.52  ===========================
+1. PLAY A 버튼 기능 고도화2
+  - 여러 mp3를 순차적으로 play할때 다음 mp3를 미리 다운로드 하는 사전 로딩 기능 구현
+  - 중간에 한국어 mp3가 들어 있어도 동작하게 로직 수정함. 
+
+============   v2.53  ===========================
+1. 좌/우 스와이프로 빠르게 넘기면 mp3가 중복해서 play되는 문제 해결
+  - playMp3B() 함수 로직 수정함
+
+============   v2.54  ===========================
+1. playMp3B() 함수에서 앞부분 짤리는 문제 수정
+  - playMp3B() 함수 로직 추가 수정함
+
+============   v2.60  ===========================
+1. 초기화, 그룹조정의 팝업 로직 수정
+  - 브라우저 기본 confirm을 사용하지 않고 모달(modal) 창 사용
+  - 기존 문제점은 html을 사용함으로써 신뢰하는 url인지 계속 물어 보는 문제 발생
+  - 대상 팝업선택 3개 함수 : getInitializeValue(), getGroupReassignValue(), selectChapter()

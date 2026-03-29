@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- 더블탭으로 웹사이트가 확대되는 것을 방지하는 코드 -->
+    <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no" />
+    <title id="my_title"></title>
+    <link href="Style.css" rel="stylesheet">
+    <link rel="shortcut icon" href="#">
+</head>
+<!-- 마우스 우클릭 및 드래그 방지 -->
+<body oncontextmenu="return false" ondragstart="return false" onselectstart="return false">
+    <div align="center" class="p_font" id="study_title" style="line-height: 1.2; margin-top: 10px;"></div>
+    <div id="show-default-button">
+        <div align="center" style="margin-bottom: 2px">
+            <button class="button4ea btn_color2" id="btn_readJson" onclick="initializeStudyData()">초기화</button>
+            <button class="button4ea btn_color2" id="btn_groupAssign" onclick="groupReassign(true)">그룹조정</button>
+            <button class="button4ea btn_color2" id="btn_setting" onclick="toggleSettings()">설 정</button>
+            <button class="button4ea btn_color2" id="btn_script" onclick="showScript()">자 막</button>
+        </div>
+    
+        <div align="center" style="margin-bottom: 2px">
+            <button class="button4ea btn_color4" id="btn_prebGroup" onclick="prebGroup()">이전그룹</button>
+            <button class="button4ea btn_color4" id="btn_nextGroup" onclick="nextGroup()">다음그룹</button>
+            <button class="button4ea btn_color8" id="btn_prevChapter" >이전 챕터</button>
+            <button class="button4ea btn_color8" id="btn_nextChapter" >다음 챕터</button>
+        </div>
+    
+        <div align="center" style="margin-bottom: 2px">
+            <button class="button4ea btn_color7" id="btn_preb" onclick="prebValue()">이 전</button>
+            <button class="button4ea btn_color7" id="btn_next" onclick="nextValue()">다 음</button>
+            <button class="button4ea btn_color6" id="btn_finish" >완 료</button>
+            <button class="button4ea btn_color3" id="btn_delete" onclick="changeToDelete()">삭 제</button>
+        </div>
+        <div align="center" style="margin-bottom: 2px">
+            <!-- 버튼 태그 생성 -->
+            <button class="button3ea btn_color5" id="btnPlayOne" onclick="playMp3B_PLAY()">PLAY</button>
+            <button class="button3ea btn_color5" id="btnPlayRepeat" onclick="togglePlayStop()">PLAY R</button>
+            <button class="button3ea btn_color5" id="btnPlayAll" onclick="toggleAllPlay()">PLAY A</button>
+        </div>
+    </div>
+    <!-- PLAY A시에 별도 버튼 생성 -->
+    <div id="show-playall-button" align="center" style="display: none;">
+        <div id="show-finish-delete-button" align="center" style="display: block;">
+            <button class="button2ea btn_color6" id="btn_change2" onclick="changeToYes()">완료</button>
+            <button class="button2ea btn_color3" id="btn_deleteWord" onclick="changeToDelete()">삭제</button>
+        </div>
+        <div id="show-previous-next-button" align="center" style="display: none;">
+            <button class="button2ea btn_color8" id="btn_prevChapter2" >이전챕터</button>
+            <button class="button2ea btn_color8" id="btn_nextChapter2" >다음챕터</button>
+        </div>
+        <div style="height: 5px;"></div> <!-- 간격 추가 -->
+        <button class="button4ea btn_color4" id="btn_nextGroup2" onclick="nextGroup2()">다음그룹</button>
+        <button class="button4ea btn_color4" id="btn_GroupAll" onclick="groupMemberToAll()">그룹모음</button>
+        <button class="button4ea btn_color7" id="btn_sleep" onclick="sleepMode()">SLEEP</button>
+        <button class="button4ea btn_color5" id="btn_stopAll" onclick="toggleAllStop()">STOP</button>
+    </div>
+    </div>
+    
+    <P></P>
+    <div id="settings-container" style="display: none;">
+        <div class="settings" id="fontresize">
+            <div id="additionalItems">
+                <label class="p_font" for="slider">Font Size(10-30) :</label>
+                <span class="p_font" id="valueDisplay"></span>
+                <br>
+                <input type="range" id="slider" min="10" max="30" step="1" oninput="changeFontSize(this.value)">
+            </div>
+        </div>
+        <div class="settings" id="showScriptModeKor">
+            <label for="id_showscript_kor">Show Kor Script :    </label>
+            <label class="switch_check">
+                <input type="checkbox" id="id_showscript_kor" onclick="toggleShowScriptSwitchKor()">
+                <span class="slider_check round"></span>
+            </label>
+        </div>
+        <div class="settings" id="showScriptMode">
+            <label for="id_showscript">Show Script :    </label>
+            <label class="switch_check">
+                <input type="checkbox" id="id_showscript" onclick="toggleShowScriptSwitch()">
+                <span class="slider_check round"></span>
+            </label>
+        </div>
+        <div class="settings" id="mp3PlayMode">
+            <label for="id_mp3PlayMode">Foreign mp3 Play :    </label>
+            <label class="switch_check">
+                <input type="checkbox" id="id_mp3PlayMode" onclick="toggleMp3PlayModeSwitch()">
+                <span class="slider_check round"></span>
+            </label>
+        </div>
+        <div class="settings" id="koreaplay">
+            <label for="korea_toggle" style="line-height: 0.5; margin: 0; padding: 0;">Korea mp3 Play :    </label>
+            <label class="switch_check">
+                <input type="checkbox" id="korea_toggle" onclick="toggleKoreaPlaySwitch()">
+                <span class="slider_check round"></span>
+            </label>
+        </div>
+        <div class="settings" id="composemode">
+            <label for="compose">Compose Mode :    </label>
+            <label class="switch_check">
+                <input type="checkbox" id="compose" onclick="toggleComposeModeSwitch()">
+                <span class="slider_check round"></span>
+            </label>
+        </div>
+        <div class="settings" id="foreignfirst">
+            <label for="foreign_first">Foreign First :    </label>
+            <label class="switch_check">
+                <input type="checkbox" id="foreign_first" onclick="toggleForeignFirstSwitch()">
+                <span class="slider_check round"></span>
+            </label>
+        </div>
+        <div class="settings" id="foreign_font_settings" style="margin-top: 10px; text-align: center; display: flex; justify-content: center; gap: 5px;">
+            <button class="button2ea btn_color4" id="btn_font_minus" onclick="chapterFontMinus()" style="font-size: 0.9em; padding: 10px 5px;">외국어폰트 -</button>
+            <button class="button2ea btn_color4" id="btn_font_plus" onclick="chapterFontPlus()" style="font-size: 0.9em; padding: 10px 5px;">외국어폰트 +</button>
+        </div>
+    </div>
+    <p></p>
+    <div id="playcount">
+        <!-- 외국어 play Count 영역이 여기에 삽입됩니다 -->
+    </div>
+    <div id="mp3nosound">
+        <!-- 외국어 play 묵음 설정이 여기에 삽입됩니다 -->
+    </div>
+    
+    <div id="myScript" >
+        <div id="myKoreanTouch" onclick="showKorScriptOnAndPlay()">
+            <p class="p_font" id="group" ></p>
+            <div class="progress-container" >
+                <div class="progress-bar" id="myProgressBar"></div>
+            </div>
+            <div class="bar" id="arrayBar" >
+            </div>
+        </div>
+        <div id="myForeignTouch" style="background-color: rgb(249, 242, 40);">
+            <p class="p_font" id="num" ></p>
+            <p class="p_font" id="mp3b" ></p>
+            <p class="p_font" id="studyState" ></p>
+        </div>
+    <div >
+
+    <div>
+        <div id="show-audio-controller" align="center" style="display: none;" >
+            <audio id="myAudio" controls style="height: 30pt; width: 97%;">
+                Your browser does not support the audio element.
+              </audio>
+        </div>
+        <!-- Script 영역을 터치하여 좌우로 넘기기 기능 구현현 -->
+        <div id="myScriptTouch">
+            <p class="p_font_script" id="script_b" style="white-space: pre-line;line-height:1.5"></p>
+            <p class="p_font_a" id="script_a" style="white-space: pre-line;"></p>
+        </div>
+        
+        <p class="p_font_c" id="pronounce"></p>
+        <p class="p_font_c" id="sleepmode"></p>
+        <!-- PLAY A(전체) 재생시 글자를 크게 보이게 하기 위함  -->
+        <p class="p_font_a_large" id="script_a_large" style="white-space: pre-line;"></p>
+        <p class="p_font_b_large" id="script_b_large" style="white-space: pre-line;"></p>
+        <p class="p_font_c" id="pronounce_large" style="white-space: pre-line;"></p>
+        <!-- PLAY A(전체) 재생시 글자를 크게 보이게 하기 위함  -->
+        <p class="p_font_c" id="explain" style="white-space: pre-line;"></p>
+        <!-- LLM 해석 -->
+        <p class="p_font_a" id="script_a_llm" style="white-space: pre-line;"></p>
+        <div id="image-container">
+            <img id="image" src="" alt="">
+        </div>
+    </div>
+
+    <!-- 화면 하단 팝업창 표시 : shewPopup("메시지", duration = 2000) -->
+    <div id="popup-window" class="popup" style="display: none;">
+        <span id="popup-message"></span>
+    </div>
+
+    <!-- Custom Confirmation Modal -->
+    <div id="confirmation-modal" class="modal-overlay" style="display: none;">
+        <div class="modal-content">
+            <p id="confirmation-message" class="p_font"></p>
+            <div class="modal-buttons">
+                <button id="confirm-btn" class="button2ea btn_color6">확인</button>
+                <button id="cancel-btn" class="button2ea btn_color3" style="margin-left: 10px;">취소</button>
+            </div>
+        </div>
+    </div>
+
+    <div id = "newTagArea">
+    </div>
+    <!-- <div>
+        <p class="p_font_a_large" id="script_a_large" style="white-space: pre-line;"></p>
+        <p class="p_font_a_large" id="script_b_large" style="white-space: pre-line;"></p>
+        <p class="p_font_a_large" id="pronounce_large" style="white-space: pre-line;"></p>
+    </div> -->
+    <p class="p_font_b" id="finishComment"></p>
+    <!-- 날짜별로 학습 현황 정보를 보여줌 -->
+    <p class="p_font" id="study_date"></p>
+    <!-- CHAPTER 별로 공부 현황 보여줌 -->
+    <p class="p_font" id="study_chapter"></p>
+    <p><a href="/html/guide.html">어플 이용 가이드 페이지 열기</a></p>
+    <!-- <p><a href="/html/settings.html">설정 페이지 열기</a></p> -->
+
+    <!-- 실행중에 화면이 꺼지지 않도록 유지해주는 모듈 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/nosleep/0.12.0/NoSleep.min.js"></script>
+    <script>
+      var noSleep = new NoSleep();
+      document.addEventListener('click', function enableNoSleep() {
+        noSleep.enable();
+        document.removeEventListener('click', enableNoSleep, false);
+      }, false);
+    </script>
+
+     -->
+
+    <script src="speak_config.js"></script>
+    <script src="speak_core.js"></script>
+    <script src="speak_ui.js"></script>
+    <script src="speak_playback.js"></script>
+    <script src="speak_navigation.js"></script>
+    <script src="speak_content.js"></script>
+    <script src="speak_services.js"></script>
+
+</body>
+</html>

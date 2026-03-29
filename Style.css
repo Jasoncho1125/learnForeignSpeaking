@@ -1,0 +1,391 @@
+:root {
+  --font_button: 16px;
+  --font_button4th : 14px;
+  --font_button5th : 13px;
+  --font_p_font : 16px;
+  --font_p_font_a : 16px;
+  --font_p_font_script : 16px;
+  /* large는 "PLAY A" 모드에서 사용 */
+  --font_p_font_a_large : 20px;
+  --font_p_font_b_large : 22px;
+  --font_p_font_b_title : 20px;
+  --font_p_font_b : 20px;
+  --font_font_guide_a : 16px;
+  /* p Tag 라인 간격 조정 */
+  /* --line_height_value : 100%;   */
+}
+
+/* 버튼을 2개 넣는 경우에 적용 */
+.button2ea {
+  background-color: #4CAF50; /* Green */
+  border: none;
+  border-radius: 6px;
+  color: white;
+  padding: 12px 12px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: var(--font_p_font_b_large);
+  margin: 1px 1px;
+  cursor: pointer;
+  flex: 1; /* 버튼이 좌우로 꽉 차게 함 */
+  width: 47%;
+  /* max-width: calc(50% - 2px);  */
+}
+
+/* 버튼 3개가 한줄에 들어가게 함 */
+.button3ea {
+  background-color: #4CAF50; /* Green */
+  border: none;
+  border-radius: 6px;
+  color: white;
+  padding: 8px 6px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: var(--font_button);
+  margin: 1px 1px;
+  cursor: pointer;
+  /* height : 40px; */
+  /* width: 31%;   한줄에 버튼이 3개 들어가도록 배치함. */
+  width: 31%;
+}
+
+/* 버튼 4개가 한줄에 들어가게 함 */
+.button4ea {
+  background-color: #4CAF50; /* Green */
+  border: none;
+  border-radius: 6px;
+  color: white;
+  padding: 8px 6px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: var(--font_button);
+  margin: 1px 1px;
+  cursor: pointer;
+  /* height : 40px; */
+  /* width: 31%;   한줄에 버튼이 3개 들어가도록 배치함. */
+  width: 23%;
+}
+
+/* 버튼 5개가 한줄에 들어가게 함 */
+.button5ea {
+  background-color: #4CAF50; /* Green */
+  border: none;
+  border-radius: 6px;
+  color: white;
+  padding: 6px 2px 6px 2px; /* top, right, bottom, left */
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: var(--font_button5th);
+  margin: 1px 0px;
+  cursor: pointer;
+  /* height : 40px; */
+  /* width: 31%;   한줄에 버튼이 3개 들어가도록 배치함. */
+  width: 18%;
+}
+
+#show-playall-button {
+  display: flex;
+  justify-content: space-between;
+}
+
+
+
+.button4th {
+  background-color: #4CAF50; /* Green */
+  border: none;
+  border-radius: 6px;
+  color: white;
+  padding: 8px 6px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: var(--font_button4th);
+  margin: 1px 1px;
+  cursor: pointer;
+  width: 31%;  /* 4번째줄의 버튼을 작게하여 4개가 들어가도록 함. */
+}
+
+/* 버튼별 색상 지정 */
+.btn_color2 {background-color: #008CBA;} /* Blue */
+.btn_color3 {background-color: #f44336;} /* Red */ 
+.btn_color4 {background-color: #59ed6d; color: black;} /* Gray */ 
+.btn_color5 {background-color: #3f3f3f;} /* Black */
+.btn_color6 {background-color: #3504fb;} /* Green */
+.btn_color7 {background-color: #fb9004; color: black;} /* Orange */
+.btn_color8 {background-color: #a504fb;} /* 보라색 */
+
+.p_font {
+  font-size: var(--font_p_font);
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
+  /* line-height: var(--line_height_value); */
+}
+
+.settings {
+  font-size: var(--font_p_font);
+  margin:0;  /* 위아래 마진을 없애기 */
+  /* margin-top: 0.5em; */
+  /* margin-bottom: 0.5em; */
+  /* line-height: var(--line_height_value); */
+}
+
+.p_font_a {
+  font-size: var(--font_p_font_a);
+  color: #050505;
+  font-weight: bold;
+  text-decoration-color : red;
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
+  /* line-height: var(--line_height_value); */
+  /* word-break:break-all; */
+}
+.p_font_script {
+  font-size: var(--font_p_font_script);
+  color: #3600f8;
+  font-weight: bold;
+  text-decoration-color : red;
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
+  /* line-height: var(--line_height_value); */
+  /* word-break:break-all; */
+}
+.p_font_a_large {
+  font-size: var(--font_p_font_a_large);
+  color: #1d00f8;
+  font-weight: bold;
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
+  /* line-height: var(--line_height_value); */
+  /* word-break:break-all; */
+}
+.p_font_b_large {
+  font-size: var(--font_p_font_b_large);
+  color: #1d00f8;
+  font-weight: bold;
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
+  /* line-height: var(--line_height_value); */
+  /* word-break:break-all; */
+}
+
+.p_font_b_title {
+  font-size: var(--font_p_font_b_title);
+  color: #2f00ff;
+  font-weight: bold;
+}
+
+.p_font_b {
+  font-size: var(--font_p_font_b);
+  color: #ff0000;
+  font-weight: bold;
+  /* line-height: var(--line_height_value); */
+}
+.p_font_c {
+  font-size: var(--font_p_font_a);
+  color: #f82500;
+  font-weight: bold;
+  text-decoration-color : red;
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
+  /* line-height: var(--line_height_value); */
+  /* word-break:break-all; */
+}
+.font_guide_a {
+  font-size: var(--font_font_guide_a);
+  width : 200px;
+}
+
+.progress-container {
+  width: 92vw; /* Set the right side to 92% of the viewport width */
+  max-width: 100%;
+  height: 10px;
+  background-color: #f2f2f2;
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.progress-bar {
+  width: 0;
+  height: 10px; /* You can adjust the thickness here */
+  background-color: #0f1ef1; /* You can adjust the color here */
+  transition: width 0.3s;
+}
+
+.dictionary-link {
+  text-decoration: underline;
+  color: blue;
+  cursor: pointer;
+}
+
+#mySript {
+  background-color: #43d90c;
+}
+
+/* 현재 그룹중에 공부 대상인 항목의 위치를 사각 바로 표시 */
+.bar {
+  display: flex;
+  width: 97%;
+  height: 10px;
+  margin-top: 5px;
+  background-color: rgb(207, 205, 205);
+  border: 1px solid rgb(251, 249, 249);
+}
+
+.cell {
+  flex: 1;
+  border-right: 1px solid white;
+}
+
+.selected {
+  background-color: rgb(17, 239, 54);
+}
+
+#slider {
+  width: 97%;
+}
+
+/* 여기는 Korea Play 스위치 버튼에 대한 CSS 값입니다.  */
+#slider_count {
+  width: 97%;
+}
+.switch_check {
+  font-size: var(--font_p_font);
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
+
+  position: relative;
+  display: inline-block;
+  width: 50px;    /* 바탕의 넓이 설정 */
+  height: 24px;   /* 바탕의 높이 설정 */
+}
+/* Hide default HTML checkbox */
+.switch_check input { 
+  font-size: var(--font_p_font);
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
+  
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider_check {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+.slider_check:before {
+  position: absolute;
+  content: "";
+  height: 18px;  /* 내부 원의 높이 설정 */
+  width: 18px;   /* 내부 원의 넓이 설정 */
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+input:checked + .slider_check {
+  background-color: #2196F3;
+}
+
+input:focus + .slider_check {
+  box-shadow: 0 0 1px #2196F3;
+}
+
+input:checked + .slider_check:before {
+  -webkit-transform: translateX(26px);
+  -ms-transform: translateX(26px);
+  transform: translateX(26px);
+}
+
+.slider_check.round {
+  border-radius: 34px;
+}
+
+.slider_check.round:before {
+  border-radius: 50%;
+}
+
+/* 팝업창의 radio 버튼 마진 주기 */
+input[type="radio"]{
+  margin-right:4px;
+  margin-left:8px;
+}
+
+/* 제일위의 타이틀에서 Chapter Name을 푸른색, 볼드, 언더라인으로 지정 */
+span.mychaptercolor {
+  color: rgb(30, 0, 255);
+  font-weight: bold;
+  text-decoration: underline;
+}
+
+#image-container {
+  width: 100%; /* Ensures the container takes up the full width of the screen */
+  overflow: hidden; /* Hides any overflow from the image */
+}
+
+#image {
+  width: 100%; /* Ensures the image takes up the full width of the container */
+  height: auto; /* Maintains the aspect ratio of the image */
+  display: block;
+}
+
+/* 팝업창을 위한 css 정의 */
+.popup {
+  padding: 15px 20px;
+  background-color: rgba(255, 255, 0, 0.8);
+  color: black;
+  position: fixed;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+  border-radius: 5px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  font-family: Arial, sans-serif;
+  font-size: 16px;
+}
+
+/* Custom Modal Styles */
+.modal-overlay {
+    position: fixed; /* Stay in place */
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6); /* Black background with opacity */
+    z-index: 1000; /* Sit on top */
+}
+
+.modal-content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #fefefe;
+    padding: 20px 30px;
+    border-radius: 10px;
+    text-align: center;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    width: 80%;
+    max-width: 400px;
+}
+
+.modal-buttons {
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+}
