@@ -4,9 +4,9 @@
  */
 const CONFIG = {
     savePageTitle: "Foreign Speaking",
-    studyFileName: 'studySpeakingData-v0.3-test.json',
+    studyFileName: 'studySpeakingData-v0.2.json',
     studySaveName: 'ForeignSpeaking',
-    version: "v0.02",
+    version: "v0.03",
 
     // 사전 연동 정보 (language -> 사전 URL 기본 경로)
     DICTIONARIES: {
