@@ -46,7 +46,7 @@ function myChapterListInfoMake() {
             // 없으면 기본 구조 생성
             filteredMetadata[chapName] = {
                 'chapterName': chapName,
-                'lastStudyNumInChapter': undefined,
+                'lastStudyNumInChapter': 0,
                 'yesNoCountInChapter': 0,
                 'totalGroupCount': 0,
                 'currGroupNum': 0,
@@ -66,9 +66,9 @@ function myChapterInfoMake(){
         'koreaPlay' : koreaPlay,
         'composeMode' : composeMode,
         'showScriptMode' : showScriptMode,
+        'showScriptModeKor' : showScriptModeKor, // [Fix] 속성 누락 추가
         'mp3PlayMode' : mp3PlayMode,
         'foreignFirst' : foreignFirst,
-        // 'aiTranslator' : aiTranslator,
         'forNoSoundLength' : forNoSoundLength,
         'defaultFontSize' : defaultFontSize,
         'defaultDevideNum' : defaultDevideNum,
@@ -86,16 +86,13 @@ function myChapterInfoMake(){
 
 // Book을 선택하는 기능 추가
 async function changeBook() {
-    saveLocalStorage();
+    saveToFirebase();
     let selectedBookName = await selectBook(); // selectBook returns book_name
     
     if (selectedBookName !== 'cancel') {
-        // [추가] 북 변경 시 해당 북의 저장된 메타데이터를 LocalStorage에서 먼저 로드하여 데이터 혼선을 막습니다.
+        // 북 이름 변경 시 Firebase에서 데이터를 다시 불러와야 하므로 loadLocalStorage를 호출합니다.
         currBookName = selectedBookName;
-        const keys = getStorageKeys();
-        const savedMetadata = localStorage.getItem(keys.myChapterList);
-        myChapterList = savedMetadata ? JSON.parse(savedMetadata) : {};
-
+        
         // [수정] UID 히스토리를 확인하여 정확한 인덱스 찾기
         let lastUid = (myChapterInfo.lastStudyNumPerBook) ? myChapterInfo.lastStudyNumPerBook[selectedBookName] : undefined;
         let foundIndex = -1;
@@ -119,8 +116,7 @@ async function changeBook() {
         await checkChapter();
         myChapterListInfoMake(); 
 
-        // [수정] 북 변경 시 기존 studyData에 저장된 group 정보를 그대로 사용함 (재할당 안 함)
-        // 현재 챕터의 최대 그룹 번호를 찾아 totalGroupCount 업데이트
+        // [수정] 불필요한 groupReassign 제거 및 기존 studyData의 group 정보 동기화
         let maxGroup = 1;
         studyData.forEach(item => {
             if (item.book_name === selectedBookName && item.chapter_name === currChapterName) {
@@ -144,7 +140,7 @@ async function changeBook() {
         chapterStudyFinishDate = myChapterList[currChapterName]?.finishDates || "";
 
         loadValue(currStudyDataNum);
-        saveLocalStorage();
+        saveToFirebase();
         showPopup(`해당 북으로 이동했습니다.`);
     }
 }
@@ -200,7 +196,7 @@ async function selectBook() {
 async function changeChapter() {
     let chapterImsi;
 
-    saveLocalStorage(); // 변경하기 전에 기존 정보를 저장한다. 
+    saveToFirebase(); // 변경하기 전에 기존 정보를 저장한다. 
     // 팝업에서 현재 북에서 하나를 선택한 값을 가져옴 
     chapterImsi = await selectChapter();
     // 북선택에서 취소를 누르거나 현재북과 동일하지 않으면 ==> 다른 북을 선택했으면 아래 진행
@@ -221,9 +217,11 @@ async function changeChapter() {
         if (!myChapterList[currChapterName]) {
             myChapterList[currChapterName] = {
                 'chapterName': currChapterName,
-                'lastStudyNumInChapter': undefined,
+                'lastStudyNumInChapter': 0,
+                'yesNoCountInChapter': 0,
                 'totalGroupCount': 0,
-                'finishDates': ""
+                'finishDates': "",
+                'groupDevideNum': 10
             };
         }
 
@@ -244,7 +242,7 @@ async function changeChapter() {
             totalGroupCount = myChapterList[currChapterName].totalGroupCount;  // 현재 Chapter의 그룹 수 세기
             findGroupMember(currGroupNum); // 현재 Chapter의 해당 그룹 멤버를 찾아옴. 
             myChapterInfo.currChapterName = currChapterName;
-            saveLocalStorage();
+            saveToFirebase();
         } else { // chapter 초기화가 필요 없으면 현재 정보를 가져온다. 
             myChapterInfo.currChapterName = currChapterName;
             myChapterInfo.currStudyDataNum = myChapterList[currChapterName].lastStudyNumInChapter;
@@ -252,8 +250,6 @@ async function changeChapter() {
             totalGroupCount = myChapterList[currChapterName].totalGroupCount;  // 현재 Chapter의 그룹
             findGroupMember(currGroupNum); // 현재 Chapter의 해당 그룹 멤버를 찾아옴. 수 세기
             lastGroupMemberCount = findLastGroupMemberCount();
-            // saveLocalStorage();
-            // loadLocalStorage();
         }
 
         loadValue(currStudyDataNum);
@@ -482,7 +478,7 @@ function showChapterStatus() {
 
     const bookLeft = bookTotal - bookDelete - bookFinish;
 
-    studyStateText += `[${currentBook} 현황] Tot/Del/Fin/Left : ${bookTotal}/${bookDelete}/${bookFinish}/${bookLeft}<br>`;
+    studyStateText += `[${currentBook} 현황] Tot/Del/Fin/Lef : ${bookTotal}/${bookDelete}/${bookFinish}/${bookLeft}<br>`;
 
     // 오늘 날짜 가져오기
     const today = new Date();
@@ -541,15 +537,12 @@ function showChapterStatus() {
 async function changeToOneChapter(){
     if(chapterList.length > 1){  // Chapter 개수가 2개 이상일때만 합치기가 가능함. 
         for (let i = 0; i < studyData.length; i++) {
-            // 현재 선택된 Book의 데이터만 변경
-            if (studyData[i].book_name === currBookName) {
-                if (!studyData[i].chapter_orig) studyData[i].chapter_orig = studyData[i].chapter_name; 
-                studyData[i].chapter = "ChapterOne"; 
-                studyData[i].chapter_name = "ChapterOne"; // [수정] 내부 식별자도 통합
-            }
+            studyData[i].chapter_orig = studyData[i].chapter; // 기존의 chapter 정보는 chapter_orig에 저장한다. 
+            studyData[i].chapter = "ChapterOne"  // Chapter 정보를 ChapterOne으로 통합한다. 
         }
-
-        currChapterName = "ChapterOne"; 
+    
+        currChapterName = "ChapterOne" 
+        document.getElementById('study_title').innerHTML = studyTitle + '<span class="mychaptercolor">' + currChapterName + '</span>';
         await checkChapter(); // chapter 정보를 조사하여 currChapterName, chapterList를 채운다. 
         myChapterListInfoMake(); // chapter List의 각종 저장 정보를 위한 object를 만든다. 
         myChapterInfoMake(); // chapter의 기본 정보 저장을 위한 object를 만든다. 
@@ -563,7 +556,7 @@ async function changeToOneChapter(){
         totalGroupCount = myChapterList[currChapterName].totalGroupCount;;  // 현재 Chapter의 그룹 수 세기
         findGroupMember(currGroupNum); // 현재 Chapter의 해당 그룹 멤버를 찾아옴. 
         loadValue(currStudyDataNum); // 처음 값을 불러와서 화면에 표시하기  
-        saveLocalStorage(); // 현재 값을 로칼 저장소에 저장함 
+        saveToFirebase(); // 현재 값을 Firebase에 저장함 
         updateProgress(0); // Initialize the progress bar
         document.getElementById('study_date').innerHTML = ""; // 초기 로딩시 date 값 삭제
         document.getElementById('finishComment').innerHTML = ""; // 초기 로딩시 과거 정보 삭제
@@ -576,27 +569,26 @@ async function changeToOneChapter(){
 // 원래의 Chapter 정보로 돌아간다. 
 async function changeToOriginalChapter(){
     for (let i = 0; i < studyData.length; i++) { 
-        if (studyData[i].book_name === currBookName && studyData[i].chapter_orig) {
-            studyData[i].chapter = studyData[i].chapter_orig;
-            studyData[i].chapter_name = studyData[i].chapter_orig; // [수정] 원복
+        if(studyData[i].chapter_orig) {
+            studyData[i].chapter = studyData[i].chapter_orig; // chapter_orig 정보를 chapter에 다시 저장한다. 
         }
     }
-
     await checkChapter(); // chapter 정보를 조사하여 currChapterName, chapterList를 채운다. 
     myChapterListInfoMake(); // chapter List의 각종 저장 정보를 위한 object를 만든다. 
     myChapterInfoMake(); // chapter의 기본 정보 저장을 위한 object를 만든다. 
     initializeChapter(3); // 해당북의 test_count, finish, finish_date 값을 초기화함.
-
     // 다시 current 암기대상 찾기
     for (let i = 0; i < studyData.length; i++) {
-        if(studyData[i].book_name === currBookName && studyData[i].finish == "no"){
+        if(studyData[i].finish == "no"){
             currStudyDataNum = i;
-            currChapterName = studyData[i].chapter_name;
+            currChapterName = studyData[i].chapter;
             break; // 최초에 미암기가 나오면 current로 하고 for문 탈출 한다. 
         } 
     }
+    myChapterInfo.currChapterName = currChapterName;
     currStudyDataNum = findFirstNumInChapter(currChapterName);  // 현재 Chapter의 첫번째 암기 대상번호를 받아온다. 
-
+    // myStudyChapterInfo.currChapterName.currStudyDataNum =  currStudyDataNum;
+    document.getElementById('study_title').innerHTML = studyTitle + '<span class="mychaptercolor">' + currChapterName + '</span>';
     yesCountInChapter = 0; // 전체 암기 완료 개수를 0으로 설정함. 
     yesNoCountInChapter = countYesNoInChapter(currChapterName); // chapter-level
     await groupReassign();  // 초기화시에 그룹 재조정 실시
@@ -604,7 +596,7 @@ async function changeToOriginalChapter(){
     totalGroupCount = myChapterList[currChapterName].totalGroupCount;;  // 현재 Chapter의 그룹 수 세기
     findGroupMember(currGroupNum); // 현재 Chapter의 해당 그룹 멤버를 찾아옴. 
     loadValue(currStudyDataNum); // 처음 값을 불러와서 화면에 표시하기  
-    saveLocalStorage(); // 현재 값을 로칼 저장소에 저장함 
+    saveToFirebase(); // 현재 값을 Firebase에 저장함 
     updateProgress(0); // Initialize the progress bar
     document.getElementById('study_date').innerHTML = ""; // 초기 로딩시 date 값 삭제
     document.getElementById('finishComment').innerHTML = ""; // 초기 로딩시 과거 정보 삭제
@@ -691,7 +683,7 @@ async function performGroupReassign(devideNum) {
             groupDevideNum = lastGroupMemberCount;
         }
         findGroupMember(1);  // group 초기화시에는 첫번째 그룹의 정보를 가져온다. 
-        saveLocalStorage();  // 지금까지 변경된 chapter 정보를 저장한다. 
+        saveToFirebase();  // 지금까지 변경된 chapter 정보를 저장한다. 
         loadValue(currStudyDataNum);  // 첫 그룹 첫번째 값을 로드 한다. 
     }
 }
@@ -742,7 +734,7 @@ async function groupReassignAll() {
             groupDevideNum = lastGroupMemberCount;
         }
         findGroupMember(1);  // group 초기화시에는 첫번째 그룹의 정보를 가져온다. 
-        saveLocalStorage();  // 지금까지 변경된 chapter 정보를 저장한다. 
+        saveToFirebase();  // 지금까지 변경된 chapter 정보를 저장한다. 
         loadValue(currStudyDataNum);  // 첫 그룹 첫번째 값을 로드 한다. 
     }
 }
@@ -811,9 +803,9 @@ async function getGroupReassignValue() {
                 }
             });
             let groupDevideNum1 = parseInt(selectedValue);
-            // defaultDevideNum 및 saveLocalStorage()는 코드 외부에서 정의되어야 함
+            // defaultDevideNum 및 saveToFirebase()는 코드 외부에서 정의되어야 함
             defaultDevideNum = groupDevideNum1;
-            saveLocalStorage(); 
+            saveToFirebase(); 
             modal.remove();
             resolve(groupDevideNum1);
         });
@@ -894,7 +886,7 @@ async function getGroupReassignValue2() {
             }
             let groupDevideNum1 = parseInt(selectedValueInChild);
             defaultDevideNum = groupDevideNum1;  // 변경된 DevideNum 을 받아와서 저장한다. 
-            saveLocalStorage();
+            saveToFirebase();
             childWindow.close();
             resolve(groupDevideNum1);
         };
@@ -927,7 +919,7 @@ function showChapterStatus() {
     }
 
     const bookLeft = bookTotal - bookDelete - bookFinish;
-    studyStateText += `[${currentBookDisplay} 현황] Tot/Del/Fin/Left : ${bookTotal}/${bookDelete}/${bookFinish}/${bookLeft}<br>`;
+    studyStateText += `[${currentBookDisplay} 현황] Tot/Del/Fin/Lef : ${bookTotal}/${bookDelete}/${bookFinish}/${bookLeft}<br>`;
 
     const today = new Date();
     const todayFormatted = (today.getMonth() + 1) + '-' + today.getDate();
@@ -975,10 +967,10 @@ function showChapterStatus() {
 function findGroupMember(thisGroupNum, thisCurNum) {
     // 시작시에 그룹 멤버 초기화
     currGroupMemberArr = [];
+    // yesNoCountInChapter = countYesNoInChapter(currChapterName); // 전체 암기 대상수
     currGroupNum = thisGroupNum;  // 현지그룹넙버값에 전달 받은 그룹 넙버값 할당.
     for (let i = 0; i < studyData.length; i++) {
-        // [보완] book_name과 chapter_name ID를 모두 확인하여 정확한 멤버 추출
-        if (studyData[i].book_name === currBookName && studyData[i].chapter_name === currChapterName && studyData[i].group == thisGroupNum) {
+        if (studyData[i].chapter == currChapterName && studyData[i].group == thisGroupNum) {
             if (studyData[i].finish == 'no') {  // 미암기 인것만 그룹 목록에 넣기
                 currGroupMemberArr.push(i);
             }
@@ -1000,8 +992,8 @@ function findGroupMember(thisGroupNum, thisCurNum) {
 function findLastGroupMemberCount() {
     let count = 0;
     for (let i = 0; i < studyData.length; i++) {
-        // [보완] ID 기반 매칭으로 변경
-        if (studyData[i].book_name === currBookName && studyData[i].chapter_name === currChapterName && parseInt(studyData[i].group) === totalGroupCount) {
+        // group 넘버가 전체 그룹 넘버와 일치한 개수를 최종 그룹멤버수 변수에 할당
+        if ((studyData[i].chapter == currChapterName) && (parseInt(studyData[i].group) == totalGroupCount)) {
             count++;
         }
     }
@@ -1054,7 +1046,7 @@ function initializeGroup(thisGroupNum, thisCurNum){
         findGroupMember(currGroupNum);
         // 그룹의 현재 값을 불러오기
         loadValue(currStudyDataNum);
-        saveLocalStorage();
+        saveToFirebase();
         showScriptOff();
         if(composeMode){
         showKorScriptOnAndPlay(); // 한글 자막이 보이도록 한다. 
@@ -1095,7 +1087,7 @@ function initializeAllGroup(){
     findGroupMember(currGroupNum);
     // 그룹의 현재 값을 불러오기
     loadValue(currStudyDataNum);
-    saveLocalStorage();
+    saveToFirebase();
     showScriptOff();
     if(composeMode){
     showKorScriptOnAndPlay(); // 한글 자막이 보이도록 한다. 

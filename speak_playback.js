@@ -415,7 +415,7 @@ async function toggleAllPlay() {
             totalGroupCount = myChapterList[currChapterName].totalGroupCount;
             findGroupMember(currGroupNum);
             myChapterInfo.currChapterName = currChapterName;
-            saveLocalStorage();
+            saveToFirebase();
         } else {
             return;
         }
@@ -537,7 +537,7 @@ const playGroupMp3s = async () => {
                 updateStudyCountInfo('play');
                 await playMp3(currentSongPath);
                 await sleepMiliSecond(myAudio.duration * 1000 * forNoSoundLength);
-                saveLocalStorage();
+                saveToFirebase();
             }
         } else {
             // 외국어 먼저 재생
@@ -558,7 +558,7 @@ const playGroupMp3s = async () => {
                 updateStudyCountInfo('play');
                 await playMp3(currentSongPath);
                 await sleepMiliSecond(myAudio.duration * 1000 * forNoSoundLength);
-                saveLocalStorage();
+                saveToFirebase();
             }
             if (koreaPlay == true) {
                 currentSongPath = "/mp3/" + studyData[currStudyDataNum].mp3_korean;
@@ -760,7 +760,7 @@ function changePlayCount(value) {
     if (document.getElementById('valueCountDisplay')) {
         document.getElementById('valueCountDisplay').textContent = value;
     }
-    saveLocalStorage(); // 변경된 playCount값을 저장하기 
+    saveToFirebase(); // 변경된 playCount값을 저장하기 
 }
 
 function showForeignNoSoundLength(value) {
@@ -785,7 +785,7 @@ function changeForeignNoSoundLength(value) {
     if (document.getElementById('valueMp3Display')) {
         document.getElementById('valueMp3Display').textContent = value;
     }
-    saveLocalStorage(); // 변경된 값을 저장함. 
+    saveToFirebase(); // 변경된 값을 저장함. 
 }
 
 

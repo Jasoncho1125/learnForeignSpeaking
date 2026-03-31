@@ -6,7 +6,7 @@ const CONFIG = {
     savePageTitle: "Foreign Speaking",
     studyFileName: 'studySpeakingData-v0.2.json',
     studySaveName: 'ForeignSpeaking',
-    version: "v0.03",
+    version: "v0.04",
 
     // 사전 연동 정보 (language -> 사전 URL 기본 경로)
     DICTIONARIES: {
@@ -35,5 +35,21 @@ const CONFIG = {
             name: 'Naver Search',
             baseUrl: 'https://search.naver.com/search.naver?query='
         }
+    },
+
+    // Firebase 웹 앱 설정
+    FIREBASE_CONFIG: {
+        apiKey: "AIzaSyDjp3DvH7soIztGVpqLKGIXY4l5qce9zIM",
+        authDomain: "studyforeingspeaking.firebaseapp.com",
+        databaseURL: "https://studyforeingspeaking-default-rtdb.asia-southeast1.firebasedatabase.app",
+        projectId: "studyforeingspeaking",
+        storageBucket: "studyforeingspeaking.firebasestorage.app",
+        messagingSenderId: "544459214663",
+        appId: "1:544459214663:web:622279a7d7250a05eb0662",
+        measurementId: "G-QCQMLEGNMB"
     }
 };
+
+// Firebase 초기화
+firebase.initializeApp(CONFIG.FIREBASE_CONFIG);
+firebase.analytics();

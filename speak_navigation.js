@@ -25,12 +25,12 @@ async function nextGroup(){
         showPopup("현재 그룹은 모두 완료 처리 되었습니다. 초기화 후 진행해 주세요");
         // 그룹의 현재 값을 불러오기
         loadValue(currStudyDataNum);
-        saveLocalStorage();
+        saveToFirebase();
         return;
     }else{
         // 그룹의 현재 값을 불러오기
         loadValue(currStudyDataNum);
-        saveLocalStorage();
+        saveToFirebase();
         showScriptOff();
         if(composeMode){
             showKorScriptOnAndPlay(); // 한글 자막이 보이도록 한다. 
@@ -74,12 +74,12 @@ function prebGroup(){
         showPopup("현재 그룹은 모두 완료 처리 되었습니다. 초기화 후 진행해 주세요");
         // 그룹의 현재 값을 불러오기
         loadValue(currStudyDataNum);
-        saveLocalStorage();
+        saveToFirebase();
         return;
     }else{
         // 그룹의 현재 값을 불러오기
         loadValue(currStudyDataNum);
-        saveLocalStorage();
+        saveToFirebase();
         showScriptOff();
         if(composeMode){
             showKorScriptOnAndPlay(); // 한글 자막이 보이도록 한다. 
@@ -122,8 +122,8 @@ function nextValue(){
                 // 그룹내 전체를 암기완료하면 아래 표시함. 
                 document.getElementById('studyState').innerHTML = "축하! 축하! 모두 암기 완료"
             }
-            // 현재 상태를 local storage에 저장함 : 나중에 불러올때 여기부터 시작하도록 함. 
-            saveLocalStorage();
+            // 현재 상태를 Firebase에 저장함 : 나중에 불러올때 여기부터 시작하도록 함. 
+            saveToFirebase();
             findDateStudyState();  // 일자별 공부 현황 Load 하기 
             if (showScriptMode){ // 자막 보이기 모드이면 자막을 보여라. 
                 showScriptOn();
@@ -171,8 +171,8 @@ function nextValue(){
                 // 그룹내 전체를 암기완료하면 아래 표시함. 
                 document.getElementById('studyState').innerHTML = "축하! 축하! 모두 암기 완료"
             }
-            // 현재 상태를 local storage에 저장함 : 나중에 불러올때 여기부터 시작하도록 함. 
-            saveLocalStorage();
+            // 현재 상태를 Firebase에 저장함 : 나중에 불러올때 여기부터 시작하도록 함. 
+            saveToFirebase();
             findDateStudyState();  // 일자별 공부 현황 Load 하기 
             if (showScriptMode){ // 자막 보이기 모드이면 자막을 보여라. 
                 showScriptOn();
@@ -235,8 +235,8 @@ function prebValue(){
                 // 그룹내 전체를 암기완료하면 아래 표시함. 
                 document.getElementById('studyState').innerHTML = "축하! 축하! 모두 암기 완료"
             }
-            // 현재 상태를 local storage에 저장함 : 나중에 불러올때 여기부터 시작하도록 함. 
-            saveLocalStorage();
+            // 현재 상태를 Firebase에 저장함 : 나중에 불러올때 여기부터 시작하도록 함. 
+            saveToFirebase();
             findDateStudyState();  // 일자별 공부 현황 Load 하기 
             if (showScriptMode){ // 자막 보이기 모드이면 자막을 보여라. 
                 showScriptOn();
@@ -279,8 +279,8 @@ function prebValue(){
                 // 그룹내 전체를 암기완료하면 아래 표시함. 
                 document.getElementById('studyState').innerHTML = "축하! 축하! 모두 암기 완료"
             }
-            // 현재 상태를 local storage에 저장함 : 나중에 불러올때 여기부터 시작하도록 함. 
-            saveLocalStorage();
+            // 현재 상태를 Firebase에 저장함 : 나중에 불러올때 여기부터 시작하도록 함. 
+            saveToFirebase();
             findDateStudyState();  // 일자별 공부 현황 Load 하기 
             if (showScriptMode){ // 자막 보이기 모드이면 자막을 보여라. 
                 showScriptOn();
@@ -363,9 +363,9 @@ async function prevChapter(option) {
             `'${prevChapterName}' 챕터의 모든 항목이 완료되었습니다. 초기화 후 다시 학습하시겠습니까?`,
             async () => {
                 initializeChapter(prevChapterName, 2); // 암기제외 유지하고 초기화
-                //await groupReassign();
+                await groupReassign();
                 loadValue(currStudyDataNum);
-                saveLocalStorage();
+                saveToFirebase();
             }
         );
         return;
@@ -389,7 +389,7 @@ async function prevChapter(option) {
         findGroupMember(targetGroup, currStudyDataNum);
 
         loadValue(currStudyDataNum);
-        saveLocalStorage();
+        saveToFirebase();
     } else {
         showPopup(`'${prevChapterName}' Chapter에 학습할 내용이 없습니다.`);
     }
@@ -426,9 +426,9 @@ async function nextChapter(option) {
             `'${nextChapterName}' 챕터의 모든 항목이 완료되었습니다. 초기화 후 다시 학습하시겠습니까?`,
             async () => {
                 initializeChapter(nextChapterName, 2); // 암기제외 유지하고 초기화
-                //await groupReassign();
+                await groupReassign();
                 loadValue(currStudyDataNum);
-                saveLocalStorage();
+                saveToFirebase();
             }
         );
         return;
@@ -451,7 +451,7 @@ async function nextChapter(option) {
         findGroupMember(targetGroup, currStudyDataNum);
 
         loadValue(currStudyDataNum);
-        saveLocalStorage();
+        saveToFirebase();
     } else {
         showPopup(`'${nextChapterName}' Chapter에 학습할 내용이 없습니다.`);
     }

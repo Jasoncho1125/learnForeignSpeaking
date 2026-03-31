@@ -15,6 +15,44 @@
   /* --line_height_value : 100%;   */
 }
 
+/* 상단 헤더 컨테이너 스타일 */
+.header-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 15px;
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+#header-program-title {
+    font-weight: bold;
+    font-size: 1.1em;
+    color: #2196F3;
+}
+
+.auth-user-info {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.user-name {
+    font-size: 0.9em;
+    color: #555;
+}
+
+.logout-icon {
+    cursor: pointer;
+    color: #f44336;
+    font-size: 1.2em;
+    transition: transform 0.2s;
+}
+
+.logout-icon:hover {
+    transform: scale(1.1);
+}
+
 /* 버튼을 2개 넣는 경우에 적용 */
 .button2ea {
   background-color: #4CAF50; /* Green */
@@ -388,4 +426,82 @@ span.mychaptercolor {
     margin-top: 20px;
     display: flex;
     justify-content: center;
+}
+
+/* --- Auth Pages Style (Merged from auth.css) --- */
+.auth-page {
+    margin: 0;
+    padding: 0;
+    font-family: 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.auth-container {
+    width: 100%;
+    max-width: 400px;
+    padding: 20px;
+}
+
+.auth-box {
+    background-color: white;
+    padding: 40px 30px;
+    border-radius: 15px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+.home-link {
+    text-decoration: none;
+    color: #333;
+}
+
+.home-link h1 {
+    font-size: 24px;
+    margin-bottom: 30px;
+    color: #2196F3;
+}
+
+.input-group {
+    text-align: left;
+    margin-bottom: 20px;
+}
+
+.input-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 14px;
+    color: #666;
+    font-weight: bold;
+}
+
+.auth-box input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-sizing: border-box;
+    font-size: 16px;
+    transition: border-color 0.3s;
+}
+
+.auth-box input:focus {
+    border-color: #2196F3;
+    outline: none;
+}
+
+.auth-box button {
+    width: 100%;
+    padding: 14px;
+    background-color: #2196F3;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 10px;
 }

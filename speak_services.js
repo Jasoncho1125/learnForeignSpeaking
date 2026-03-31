@@ -137,7 +137,7 @@ const updateStudyCountInfo = (type) => {
         myChapterInfo.studyFinishCountInDay[today]++;
     }
 
-    saveLocalStorage(); // 변경된 값 저장
+    saveToFirebase(); // 변경된 값 저장
     displayStudyCountInfo(myChapterInfo); // 업데이트 값 출력
 };
 

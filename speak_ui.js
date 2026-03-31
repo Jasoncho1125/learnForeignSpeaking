@@ -53,13 +53,6 @@ function toggleSettings() {
         document.getElementById('compose').checked = composeMode;
         document.getElementById('foreign_first').checked = foreignFirst;
         
-        const aiRadios = document.getElementsByName('aiSelect');
-        aiRadios.forEach(radio => {
-            if (radio.value === aiTranslator) {
-                radio.checked = true;
-            }
-        });
-
         settingsContainer.style.display = 'block';
         btn_setting.textContent = "설정닫기";
     }
@@ -68,7 +61,7 @@ function toggleSettings() {
 // input slider 에서 아래 함수를 호출하여 폰트 설정을 함. 
 function changeFontSize(value) {
     defaultFontSize = parseInt(value); // 기본 폰트 사이즈를 변경함. 
-    saveLocalStorage(); // 변경된 기본 폰트 사이즈를 메모리에 저장함. 
+    saveToFirebase(); // 변경된 기본 폰트 사이즈를 Firebase에 저장함. 
     let font_button = value;
     let font_button4th = parseInt(value) - 2;  // 숫자로 변환하여 폰트 크기 변경
     let font_button5th = parseInt(value) - 3;
@@ -119,7 +112,7 @@ function toggleShowScriptSwitchKor() {
     } else {
         showScriptModeKor = false;
     }
-    saveLocalStorage(); // 변경된 composeMode 정보를 저장한다. 
+    saveToFirebase(); // 변경된 composeMode 정보를 저장한다. 
 }
 
 
@@ -140,7 +133,7 @@ function toggleShowScriptSwitch() {
     } else {
         showScriptMode = false;
     }
-    saveLocalStorage(); // 변경된 composeMode 정보를 저장한다. 
+    saveToFirebase(); // 변경된 composeMode 정보를 저장한다. 
 }
 
 
@@ -163,7 +156,7 @@ function toggleMp3PlayModeSwitch() {
         mp3PlayMode = false;
         showPopup("한곡씩 play 되는 PLAY 모드에서 외국어 MP3 Play가 되지 않도록 설정을 변경합니다.", 3000);
     }
-    saveLocalStorage(); // 변경된 composeMode 정보를 저장한다. 
+    saveToFirebase(); // 변경된 composeMode 정보를 저장한다. 
 }
 
 
@@ -185,7 +178,7 @@ function toggleKoreaPlaySwitch() {
     } else {
         koreaPlay = false;
     }
-    saveLocalStorage(); // 변경된 koreaPlay 정보를 저장한다. 
+    saveToFirebase(); // 변경된 koreaPlay 정보를 저장한다. 
 }
 
 // 한국어를 먼저 보고 외국어를 만들어내는 composeMode를 설정하는 스위치
@@ -205,7 +198,7 @@ function toggleComposeModeSwitch() {
     } else {
         composeMode = false;
     }
-    saveLocalStorage(); // 변경된 composeMode 정보를 저장한다. 
+    saveToFirebase(); // 변경된 composeMode 정보를 저장한다. 
 }
 
 
@@ -228,7 +221,7 @@ function toggleForeignFirstSwitch() {
     } else {
         foreignFirst = false;
     }
-    saveLocalStorage(); // 변경된 foreignFirst 정보를 저장한다. 
+    saveToFirebase(); // 변경된 foreignFirst 정보를 저장한다. 
 }
 
 // // AI 번역기를 선택하는 스위치
@@ -242,7 +235,7 @@ function toggleForeignFirstSwitch() {
 // function toggleAiTranslatorSwitch() {
 //     const selectedValue = document.querySelector('input[name="aiSelect"]:checked').value;
 //     aiTranslator = selectedValue;
-//     saveLocalStorage(); // 변경된 AI 번역기 정보를 저장한다. 
+//     saveToFirebase(); // 변경된 AI 번역기 정보를 저장한다. 
 // }
 
 // PLAY A 모드에서 슬립모드 설정하기
@@ -372,7 +365,7 @@ async function getSleepModeValue() {
             }
             let sleepTime = parseFloat(selectedValueInChild);
             // defaultDevideNum = groupDevideNum1;  // 변경된 DevideNum 을 받아와서 저장한다. 
-            // saveLocalStorage();
+            // saveToFirebase();
             childWindow.close();
             resolve(sleepTime);
         };
@@ -396,4 +389,3 @@ function updateProgress(newProgress) {
     updateProgressBar(newProgress);
     // requestScreenOn();  // 화면 켜짐 유지 요청하기
 }
-

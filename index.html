@@ -8,9 +8,17 @@
     <title id="my_title"></title>
     <link href="Style.css" rel="stylesheet">
     <link rel="shortcut icon" href="#">
+    <!-- 아이콘 사용을 위한 Font Awesome 추가 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <!-- 마우스 우클릭 및 드래그 방지 -->
 <body oncontextmenu="return false" ondragstart="return false" onselectstart="return false">
+    <div class="header-container">
+        <div id="header-program-title">Foreign Speaking <span id="header-version" style="font-size: 0.7em; font-weight: normal; margin-left: 5px; opacity: 0.8;"></span></div>
+        <div id="auth-ui">
+            <!-- 로그인 상태에 따라 버튼이 동적으로 변합니다 -->
+        </div>
+    </div>
     <div align="center" class="p_font" id="study_title" style="line-height: 1.2; margin-top: 10px;"></div>
     <div id="show-default-button">
         <div align="center" style="margin-bottom: 2px">
@@ -209,10 +217,17 @@
 
      -->
 
+    <!-- Firebase SDKs (전역 스크립트 호환 버전) -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-analytics-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+
     <script src="speak_config.js"></script>
     <script src="speak_core.js"></script>
     <script src="speak_ui.js"></script>
     <script src="speak_playback.js"></script>
+    <script src="speak_auth.js"></script>
     <script src="speak_navigation.js"></script>
     <script src="speak_content.js"></script>
     <script src="speak_services.js"></script>
