@@ -274,7 +274,7 @@ function checkNewChapter() {
 function findFirstStudyDataInChapter(chapterName) {
     let firstData = 0;
     for (let i = 0; i < studyData.length; i++) {
-        if (studyData[i].chapter == chapterName) {
+        if (studyData[i].book_name === currBookName && studyData[i].chapter_name == chapterName) {
             firstData = i;
             break;
         }
@@ -286,7 +286,7 @@ function findFirstStudyDataInChapter(chapterName) {
 function findFirstStudyNoFinishDataInChapter(chapterName) {
     let firstNoFinishData;
     for (let i = 0; i < studyData.length; i++) {
-        if (studyData[i].chapter == chapterName && studyData[i].finish == "no") {
+        if (studyData[i].book_name === currBookName && studyData[i].chapter_name == chapterName && studyData[i].finish == "no") {
             firstNoFinishData = i;
             break;
         }
@@ -653,13 +653,13 @@ async function performGroupReassign(devideNum) {
         lastGroupMemberCount = 0;  // 마지막 그룹의 카운트를 0으로 설정
         // 현재 챕터의 모든 데이터 그룹 값을 초기화
         for (let i = 0; i < studyData.length; i++) {
-            if (studyData[i].chapter == currChapterName) {
+            if (studyData[i].book_name === currBookName && studyData[i].chapter_name === currChapterName) {
                 studyData[i].group = "";
             }
         }
         // 현재 챕터의 미완료 항목에 대해서만 그룹을 재할당
         for (let i = 0; i < studyData.length; i++) {
-            if (studyData[i].chapter == currChapterName && studyData[i].finish == 'no') {
+            if (studyData[i].book_name === currBookName && studyData[i].chapter_name === currChapterName && studyData[i].finish == 'no') {
                 studyData[i].group = currentGroup;
                 currentGroupCount = currentGroupCount + 1;
                 if (currentGroupCount >= groupDevideNum) {
@@ -670,7 +670,7 @@ async function performGroupReassign(devideNum) {
         }
         // 전체 그룹의 수를 조사하여 전역 변수에 할당함. 
         for (let i = 0; i < studyData.length; i++) {
-            if (studyData[i].chapter == currChapterName && studyData[i].finish == 'no') {
+            if (studyData[i].book_name === currBookName && studyData[i].chapter_name === currChapterName && studyData[i].finish == 'no') {
                 totalGroupCount = studyData[i].group;
             }
         }
@@ -701,7 +701,7 @@ async function groupReassignAll() {
         lastGroupMemberCount = 0;  // 마지막 그룹의 카운트를 0으로 설정
         // 해당 chapter의 모든 데이터의 그룹 값을 null 로 변경함 : "" 
         for (let i = 0; i < studyData.length; i++) {
-            if (studyData[i].chapter == currChapterName) {
+            if (studyData[i].book_name === currBookName && studyData[i].chapter_name === currChapterName) {
                 // if(studyData[i].finish == 'yes'){  // yes는 모두 no로 변경함. 
                 //     studyData[i].finish = 'no';
                 // }
@@ -710,7 +710,7 @@ async function groupReassignAll() {
         }
         // 모든 항목을 검사하여, 암기 완료가 no 이면서, 지정된 그룹 숫자에 맞게 재조정함. 
         for (let i = 0; i < studyData.length; i++) {
-            if (studyData[i].chapter == currChapterName && studyData[i].finish == 'no') {
+            if (studyData[i].book_name === currBookName && studyData[i].chapter_name === currChapterName && studyData[i].finish == 'no') {
                 studyData[i].group = currentGroup;
                 currentGroupCount = currentGroupCount + 1;
                 if (currentGroupCount >= groupDevideNum) {
@@ -721,7 +721,7 @@ async function groupReassignAll() {
         }
         // 전체 그룹의 수를 조사하여 전역 변수에 할당함. 
         for (let i = 0; i < studyData.length; i++) {
-            if (studyData[i].chapter == currChapterName && studyData[i].finish == 'no') {
+            if (studyData[i].book_name === currBookName && studyData[i].chapter_name === currChapterName && studyData[i].finish == 'no') {
                 totalGroupCount = studyData[i].group;
             }
         }
@@ -970,7 +970,7 @@ function findGroupMember(thisGroupNum, thisCurNum) {
     // yesNoCountInChapter = countYesNoInChapter(currChapterName); // 전체 암기 대상수
     currGroupNum = thisGroupNum;  // 현지그룹넙버값에 전달 받은 그룹 넙버값 할당.
     for (let i = 0; i < studyData.length; i++) {
-        if (studyData[i].chapter == currChapterName && studyData[i].group == thisGroupNum) {
+        if (studyData[i].book_name === currBookName && studyData[i].chapter_name == currChapterName && parseInt(studyData[i].group) == thisGroupNum) {
             if (studyData[i].finish == 'no') {  // 미암기 인것만 그룹 목록에 넣기
                 currGroupMemberArr.push(i);
             }
@@ -1025,7 +1025,7 @@ function initializeGroup(thisGroupNum, thisCurNum){
         // yesNoCountInChapter = countYesNoInChapter(currChapterName); // 전체 암기 대상수
         currGroupNum = thisGroupNum;  // 현지그룹넙버값에 전달 받은 그룹 넙버값 할당.
         for (let i = 0; i < studyData.length; i++) {
-            if (studyData[i].chapter == currChapterName && studyData[i].group == currGroupNum) {
+            if (studyData[i].book_name === currBookName && studyData[i].chapter_name === currChapterName && studyData[i].group == currGroupNum) {
                 if (studyData[i].finish == 'no') {  // no 이면 그룹 목록에 넣기
                     currGroupMemberArr.push(i);
                 } else if(studyData[i].finish == 'yes'){  // yes이면 no로 변경하여 그룹 목록에 넣기
@@ -1066,7 +1066,7 @@ function initializeAllGroup(){
     // yesNoCountInChapter = countYesNoInChapter(currChapterName); // 전체 암기 대상수
     // currGroupNum = thisGroupNum;  // 현지그룹넙버값에 전달 받은 그룹 넙버값 할당.
     for (let i = 0; i < studyData.length; i++) {
-        if (studyData[i].chapter == currChapterName) {
+        if (studyData[i].book_name === currBookName && studyData[i].chapter_name === currChapterName) {
             if (studyData[i].finish == 'no') {  // no 이면 그룹 목록에 넣기
                 currGroupMemberArr.push(i);
             } else if(studyData[i].finish == 'yes'){  // yes이면 no로 변경하여 그룹 목록에 넣기

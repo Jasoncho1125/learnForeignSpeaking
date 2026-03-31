@@ -309,9 +309,8 @@ function prebValue(){
 
 // Helper function to find the first unfinished item in a chapter
 function findFirstUnfinishedInChapter(chapterName) {
-    const currentBook = (studyData && studyData[currStudyDataNum]) ? studyData[currStudyDataNum].book : "";
     for (let i = 0; i < studyData.length; i++) {
-        if (studyData[i].book === currentBook && studyData[i].chapter === chapterName && studyData[i].finish === 'no') {
+        if (studyData[i].book_name === currBookName && studyData[i].chapter_name === chapterName && studyData[i].finish === 'no') {
             return i;
         }
     }
@@ -320,9 +319,8 @@ function findFirstUnfinishedInChapter(chapterName) {
 
 // Helper function to find the very first item in a chapter
 function findFirstItemInChapter(chapterName) {
-    const currentBook = (studyData && studyData[currStudyDataNum]) ? studyData[currStudyDataNum].book : "";
     for (let i = 0; i < studyData.length; i++) {
-        if (studyData[i].book === currentBook && studyData[i].chapter === chapterName) {
+        if (studyData[i].book_name === currBookName && studyData[i].chapter_name === chapterName) {
             return i;
         }
     }

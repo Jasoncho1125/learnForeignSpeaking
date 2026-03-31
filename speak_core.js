@@ -345,7 +345,7 @@ async function loadJsonFromFile() {
 function findFirstNumInChapter(chapterName) {
     let count = 0;
     for (let i = 0; i < studyData.length; i++) {
-        if (studyData[i].chapter_name == chapterName) {
+        if (studyData[i].book_name === currBookName && studyData[i].chapter_name == chapterName) {
             count = i;
             break;
         }
@@ -740,7 +740,7 @@ async function changeToYesAllInGroup() {
         return;
     }
     for (let i = 0; i < studyData.length; i++) {
-        if (studyData[i].chapter == currChapterName && studyData[i].group == currGroupNum &&(studyData[i].finish == 'no')) {
+        if (studyData[i].book_name === currBookName && studyData[i].chapter_name == currChapterName && studyData[i].group == currGroupNum &&(studyData[i].finish == 'no')) {
             currStudyDataNum = i;
             loadValue(currStudyDataNum);
             await changeToYes();
@@ -921,7 +921,7 @@ function findDateStudyState() {
     let result = {}; // finish 날짜를 중복 제거하여 넣을 오브젝트 선언
     // finish_date 날짜가 들어간 배열을 만든다. 
     for (let i = 0; i < studyData.length; i++) {
-        if (studyData[i].chapter == currChapterName && studyData[i].finish_date != '') {
+        if (studyData[i].book_name === currBookName && studyData[i].chapter_name == currChapterName && studyData[i].finish_date != '') {
             studyDateArr.push(studyData[i].finish_date);
         }
     }
@@ -1153,10 +1153,6 @@ async function loadFromFirebase() {
     yesNoCountInChapter = countYesNoInChapter(currChapterName); // [Fix] 전역 변수에 할당 추가
     findGroupMember(currGroupNum, currStudyDataNum);  // 저장된 그룹과 번호의 정보를 가져온다.
     loadValue(currStudyDataNum); // 현재 값을 값을 로드 한다.  
-    // json 파일에서 language 정보를 가져온다. 
-    if (studyData.length > 0 && studyData[0].language) {
-        studyLang = studyData[0].language;
-    }
     findDateStudyState();  // 일자별 공부 현황 Load 하기 
     changeFontSize(defaultFontSize); // 변경된 폰트 사이즈로 폰트크기 재 설정하기 
 }
