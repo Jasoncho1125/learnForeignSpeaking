@@ -61,6 +61,11 @@ function toggleSettings() {
 // input slider 에서 아래 함수를 호출하여 폰트 설정을 함. 
 function changeFontSize(value) {
     defaultFontSize = parseInt(value); // 기본 폰트 사이즈를 변경함. 
+    
+    // [추가] 메인 폰트 사이즈 변경 시 외국어 폰트 사이즈도 기본 비율(+4)에 맞춰 동기화함
+    // 사용자가 별도로 +/- 버튼을 누르기 전까지는 이 비율을 유지함
+    script_b_Font = defaultFontSize + 4;
+
     saveToFirebase(); // 변경된 기본 폰트 사이즈를 Firebase에 저장함. 
     let font_button = value;
     let font_button4th = parseInt(value) - 2;  // 숫자로 변환하여 폰트 크기 변경

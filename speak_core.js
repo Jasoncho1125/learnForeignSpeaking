@@ -44,7 +44,7 @@ let yesCountInChapter;  // Chapter에서 전체 암기 완료한 수
 let forNoSoundLength;  // mp3 전체 재생시에 외국어 mp3간 묵음 구간  => myChapterInfo
 let defaultFontSize; // 기본 폰트 사이즈 설정 => myChapterInfo
 let defaultDevideNum; // 기본적으로 그룹을 나누는 값  ==> myChapterInfo 에 저장
-let script_b_Font; // chapter인 경우 글자를 크게하기 위하여 사용 => myChapterInfo
+let script_b_Font = 20; // chapter인 경우 글자를 크게하기 위하여 사용 => myChapterInfo
 let defaultPlayCount = 1; // 전체 재생시 외국어 반복 횟수 지정 (기본 1회)
 let studyDataVersion; // 현재 학습중인 stady Data의 Version 정보 저장 => myChapterInfo
 let studyCountInDay; // 날마다 몇번씩 공부를 했는지 mp3 재생 회수 저장 => myChapterInfo
@@ -292,13 +292,13 @@ async function loadJsonFromFile() {
     koreaPlay = false;
     composeMode = false;
     showScriptMode = true; // 초기값에 항상 script가 보이도록 설정함. 
-    showScriptModeKor = true; // [Fix] 초기값 설정 누락 추가
-    mp3PlayMode = true; // 초기값은 항상 play 하도록 true로 설정한다.
+    showScriptModeKor = true;
+    mp3PlayMode = true; 
     foreignFirst = false; 
     forNoSoundLength = 1.0;
     defaultFontSize = 16;
+    script_b_Font = defaultFontSize; 
     defaultDevideNum = 8;
-    script_b_Font = 20;
     defaultPlayCount = 1;
     studyDataVersion = studyFileName;
 
@@ -345,7 +345,7 @@ async function loadJsonFromFile() {
 function findFirstNumInChapter(chapterName) {
     let count = 0;
     for (let i = 0; i < studyData.length; i++) {
-        if (studyData[i].book_name === currBookName && studyData[i].chapter_name == chapterName) {
+        if (studyData[i].chapter_name == chapterName) {
             count = i;
             break;
         }
@@ -531,6 +531,12 @@ function showScriptOn() {
     }
     // 외국어 자막 보이기 
     document.getElementById('script_b').innerHTML = studyData[currStudyDataNum].script_foreign;
+
+    // [수정] studyLang 조건에 상관없이 사용자가 조정한 외국어 폰트 사이즈(script_b_Font)를 적용함
+    if (script_b_Font) {
+        document.getElementById('script_b').style.fontSize = script_b_Font + "px";
+    }
+
     // 발음이 있으면 발음 추가함. 
     if (studyData[currStudyDataNum].pronounce) {
         document.getElementById('pronounce').innerHTML = studyData[currStudyDataNum].pronounce;
@@ -556,14 +562,6 @@ function showScriptOn() {
         document.getElementById('script_b').style.fontSize = hanjaFont;
         document.getElementById('script_b').style.fontWeight = "normal";
         document.getElementById('script_b').style.color = "red";
-    }
-    // 책인 경우에는 별도의 chapter용 스크립트 폰트를 사용하여 더 크게 보이게 함 
-    // if (studyLang == 'chapter') {
-    if (studyLang == 'chapter') {
-        if(!script_b_Font){ // 만약 값이 null, 0 이면 default 값 설정
-            script_b_Font = 20;
-        }
-        document.getElementById('script_b').style.fontSize = script_b_Font + "px";
     }
     // 설명이 있으면 설명 추가함. 
     if (studyData[currStudyDataNum].explain) {
@@ -740,7 +738,7 @@ async function changeToYesAllInGroup() {
         return;
     }
     for (let i = 0; i < studyData.length; i++) {
-        if (studyData[i].book_name === currBookName && studyData[i].chapter_name == currChapterName && studyData[i].group == currGroupNum &&(studyData[i].finish == 'no')) {
+        if (studyData[i].chapter == currChapterName && studyData[i].group == currGroupNum &&(studyData[i].finish == 'no')) {
             currStudyDataNum = i;
             loadValue(currStudyDataNum);
             await changeToYes();
@@ -1012,11 +1010,10 @@ function saveToFirebase() {
     
     myChapterInfo.currChapterName = currChapterName;
     myChapterInfo.currBookName = currBookName; // Book 정보 저장
-    // [수정] 인덱스 대신 UID를 저장하여 데이터 변경 시에도 위치를 보존함
-    myChapterInfo.currStudyUid = (studyData && studyData[currStudyDataNum]) ? studyData[currStudyDataNum].uid : null;
-    myChapterInfo.currStudyDataNum = currStudyDataNum; // 하위 호환성을 위해 유지
 
-    // [추가] Book별 마지막 학습 위치를 저장하기 위한 매핑 로직
+    myChapterInfo.currStudyUid = (studyData && studyData[currStudyDataNum]) ? studyData[currStudyDataNum].uid : null;
+    myChapterInfo.currStudyDataNum = currStudyDataNum || 0; 
+
     if (!myChapterInfo.lastStudyNumPerBook) myChapterInfo.lastStudyNumPerBook = {};
     const currentItem = (studyData && studyData[currStudyDataNum]) ? studyData[currStudyDataNum] : null;
     if (currentItem) {
@@ -1030,25 +1027,22 @@ function saveToFirebase() {
     myChapterInfo.mp3PlayMode = mp3PlayMode;
     myChapterInfo.foreignFirst = foreignFirst;
     myChapterInfo.forNoSoundLength = forNoSoundLength;
-    if (defaultFontSize == 0) {
-        defaultFontSize = 16;
-    }
-    myChapterInfo.defaultFontSize = defaultFontSize;
+
+    myChapterInfo.defaultFontSize = defaultFontSize || 16;
     myChapterInfo.defaultDevideNum = defaultDevideNum;
-    myChapterInfo.script_b_Font = script_b_Font;
+    myChapterInfo.script_b_Font = script_b_Font || myChapterInfo.defaultFontSize; 
     myChapterInfo.defaultPlayCount = defaultPlayCount;
     myChapterInfo.studyDataVersion = studyFileName;
 
     if (currChapterName && myChapterList[currChapterName]) {
-        myChapterList[currChapterName].yesNoCountInChapter = yesNoCountInChapter || 0;
-        // myChapterList[currChapterName].countYesInChapter = countYesInChapter;
-        myChapterList[currChapterName].finishDates = chapterStudyFinishDate || "";
-        myChapterList[currChapterName].groupDevideNum = groupDevideNum || 10;
-        myChapterList[currChapterName].lastGroupMemberCount = lastGroupMemberCount || 0;
-        myChapterList[currChapterName].totalGroupCount = totalGroupCount || 0;
+        myChapterList[currChapterName].yesNoCountInChapter = yesNoCountInChapter;
+
+        myChapterList[currChapterName].finishDates = chapterStudyFinishDate;
+        myChapterList[currChapterName].groupDevideNum = groupDevideNum;
+        myChapterList[currChapterName].lastGroupMemberCount = lastGroupMemberCount;
+        myChapterList[currChapterName].totalGroupCount = totalGroupCount;  // 실시간 함수 사용으로 미저장
     }
 
-    // [추가] Firebase Realtime Database 저장 로직 (로그인 시)
     if (user) {
         const db = firebase.database();
         const basePath = `users/${user.uid}/${studySaveName}`;
@@ -1092,7 +1086,7 @@ async function loadFromFirebase() {
     let savedIndex = myChapterInfo.currStudyDataNum;
     defaultFontSize = myChapterInfo.defaultFontSize;
     defaultDevideNum = myChapterInfo.defaultDevideNum;
-    script_b_Font = myChapterInfo.script_b_Font;
+    script_b_Font = myChapterInfo.script_b_Font || (defaultFontSize + 4); // 저장된 값이 없으면 기본 오프셋 적용
     defaultPlayCount = myChapterInfo.defaultPlayCount;
     koreaPlay = myChapterInfo.koreaPlay;
     composeMode = myChapterInfo.composeMode;
@@ -1126,7 +1120,6 @@ async function loadFromFirebase() {
         };
     });
 
-    // [추가] UID를 사용하여 정확한 인덱스 위치 복원
     if (myChapterInfo.currStudyUid) {
         const foundIndex = studyData.findIndex(i => i.uid === myChapterInfo.currStudyUid);
         if (foundIndex !== -1) savedIndex = foundIndex;
@@ -1143,16 +1136,20 @@ async function loadFromFirebase() {
 
     await checkChapter(); // 저장소 로드 후 챕터 목록 갱신
     if (myChapterList && myChapterList[currChapterName]) {
-        totalGroupCount = myChapterList[currChapterName].totalGroupCount || 0;
-        groupDevideNum = myChapterList[currChapterName].groupDevideNum || 10;
-        lastGroupMemberCount = myChapterList[currChapterName].lastGroupMemberCount || 0;
-        chapterStudyFinishDate = myChapterList[currChapterName].finishDates || "";
+        totalGroupCount = myChapterList[currChapterName].totalGroupCount;;
+        groupDevideNum = myChapterList[currChapterName].groupDevideNum;
+        lastGroupMemberCount = myChapterList[currChapterName].lastGroupMemberCount;
+        chapterStudyFinishDate = myChapterList[currChapterName].finishDates;
     }
 
-    yesCountInChapter = countYesInChapter(currChapterName);  // 전체 암기 완료한 값을 찾는다. 
-    yesNoCountInChapter = countYesNoInChapter(currChapterName); // [Fix] 전역 변수에 할당 추가
+    yesCountInChapter = countYesInChapter(currChapterName); 
+    yesNoCountInChapter = countYesNoInChapter(currChapterName); 
     findGroupMember(currGroupNum, currStudyDataNum);  // 저장된 그룹과 번호의 정보를 가져온다.
     loadValue(currStudyDataNum); // 현재 값을 값을 로드 한다.  
+    // json 파일에서 language 정보를 가져온다. 
+    if (studyData.length > 0 && studyData[0].language) {
+        studyLang = studyData[0].language;
+    }
     findDateStudyState();  // 일자별 공부 현황 Load 하기 
     changeFontSize(defaultFontSize); // 변경된 폰트 사이즈로 폰트크기 재 설정하기 
 }

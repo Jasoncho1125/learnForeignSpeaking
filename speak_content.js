@@ -72,7 +72,7 @@ function myChapterInfoMake(){
         'forNoSoundLength' : forNoSoundLength,
         'defaultFontSize' : defaultFontSize,
         'defaultDevideNum' : defaultDevideNum,
-        'script_b_Font' : 20,
+        'script_b_Font' : script_b_Font, // Use the global variable for initialization
         'defaultPlayCount' : defaultPlayCount,
         'studyDataVersion' : studyDataVersion,
         'studyCountInDay': {  // 날짜별 mp3 play한 회수 저장
@@ -225,9 +225,11 @@ async function changeChapter() {
             };
         }
 
+        // [Fix] 챕터 이동 즉시 기존 완료 날짜 히스토리를 전역 변수에 로드하여 데이터 덮어쓰기 방지
+        chapterStudyFinishDate = myChapterList[currChapterName].finishDates || "";
+
         // 현재 변경된 chapter의 저장된 공부대상 정보를 받아온다. 
         currStudyDataNum = myChapterList[currChapterName].lastStudyNumInChapter; 
-        chapterStudyFinishDate = myChapterList[currChapterName].finishDates; // 공부완료한 날짜 정보 받아오기
         totalGroupCount = myChapterList[currChapterName].totalGroupCount;  // 현재 Chapter의 그룹 수
 
         // 만약 currStudyDataNum가 undefined이면 대상 북을 초기화 한다.
@@ -537,8 +539,11 @@ function showChapterStatus() {
 async function changeToOneChapter(){
     if(chapterList.length > 1){  // Chapter 개수가 2개 이상일때만 합치기가 가능함. 
         for (let i = 0; i < studyData.length; i++) {
-            studyData[i].chapter_orig = studyData[i].chapter; // 기존의 chapter 정보는 chapter_orig에 저장한다. 
-            studyData[i].chapter = "ChapterOne"  // Chapter 정보를 ChapterOne으로 통합한다. 
+            // [Fix] 현재 북(Book)에 해당하는 데이터만 통합하도록 필터링 강화
+            if (studyData[i].book_name === currBookName) {
+                studyData[i].chapter_orig = studyData[i].chapter_name; 
+                studyData[i].chapter_name = "ChapterOne" 
+            }
         }
     
         currChapterName = "ChapterOne" 
@@ -569,8 +574,9 @@ async function changeToOneChapter(){
 // 원래의 Chapter 정보로 돌아간다. 
 async function changeToOriginalChapter(){
     for (let i = 0; i < studyData.length; i++) { 
-        if(studyData[i].chapter_orig) {
-            studyData[i].chapter = studyData[i].chapter_orig; // chapter_orig 정보를 chapter에 다시 저장한다. 
+        // [Fix] 현재 북(Book)에 대해서만 원래 챕터로 복구
+        if(studyData[i].book_name === currBookName && studyData[i].chapter_orig) {
+            studyData[i].chapter_name = studyData[i].chapter_orig; 
         }
     }
     await checkChapter(); // chapter 정보를 조사하여 currChapterName, chapterList를 채운다. 
@@ -579,9 +585,10 @@ async function changeToOriginalChapter(){
     initializeChapter(3); // 해당북의 test_count, finish, finish_date 값을 초기화함.
     // 다시 current 암기대상 찾기
     for (let i = 0; i < studyData.length; i++) {
-        if(studyData[i].finish == "no"){
+        // [Fix] 현재 북 기준으로 미암기 대상 찾기
+        if(studyData[i].book_name === currBookName && studyData[i].finish == "no"){
             currStudyDataNum = i;
-            currChapterName = studyData[i].chapter;
+            currChapterName = studyData[i].chapter_name;
             break; // 최초에 미암기가 나오면 current로 하고 for문 탈출 한다. 
         } 
     }
@@ -993,7 +1000,7 @@ function findLastGroupMemberCount() {
     let count = 0;
     for (let i = 0; i < studyData.length; i++) {
         // group 넘버가 전체 그룹 넘버와 일치한 개수를 최종 그룹멤버수 변수에 할당
-        if ((studyData[i].chapter == currChapterName) && (parseInt(studyData[i].group) == totalGroupCount)) {
+        if (studyData[i].book_name === currBookName && studyData[i].chapter_name === currChapterName && (parseInt(studyData[i].group) == totalGroupCount)) {
             count++;
         }
     }

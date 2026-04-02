@@ -352,7 +352,7 @@ async function prevChapter(option) {
     // 중요: 챕터 이름을 먼저 변경해야 이후 로직이 정상 동작함
     currChapterName = prevChapterName;
     // [오류 수정] 이전 챕터의 완료 날짜 정보가 새 챕터로 복사되는 것을 방지하기 위해 데이터를 동기화합니다.
-    chapterStudyFinishDate = (myChapterList[currChapterName] && myChapterList[currChapterName].finishDates) ? myChapterList[currChapterName].finishDates : "";
+    chapterStudyFinishDate = myChapterList[currChapterName]?.finishDates || "";
 
     let studyNum = findFirstUnfinishedInChapter(prevChapterName);
     if (studyNum === -1) {
@@ -415,7 +415,7 @@ async function nextChapter(option) {
     // 중요: 챕터 이름을 먼저 변경
     currChapterName = nextChapterName;
     // [오류 수정] 이전 챕터의 완료 날짜 정보가 새 챕터로 복사되는 것을 방지하기 위해 데이터를 동기화합니다.
-    chapterStudyFinishDate = (myChapterList[currChapterName] && myChapterList[currChapterName].finishDates) ? myChapterList[currChapterName].finishDates : "";
+    chapterStudyFinishDate = myChapterList[currChapterName]?.finishDates || "";
 
     let studyNum = findFirstUnfinishedInChapter(nextChapterName);
     if (studyNum === -1) {
