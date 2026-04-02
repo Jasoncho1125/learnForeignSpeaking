@@ -1,10 +1,10 @@
 // 영어 문장에 대해서 단어를 클릭하면 네이버 사전으로 연결하는 기능 구현
 function showDictionaryWord(sentence) {
-    // 설정에 정의된 언어인지 확인 (config에 있는 언어들은 script_b에 링크 생성)
+    // 설정에 정의된 언어인지 확인 (config에 있는 언어들은 script_foreign에 링크 생성)
     const langConfig = CONFIG.DICTIONARIES[studyLang];
     
-    // 일본어, 중국어는 발음(pronounce) 영역에, 나머지는 외국어 스크립트(script_b) 영역에 링크 생성
-    const targetId = (studyLang === 'japanese' || studyLang === 'chinese') ? 'pronounce' : 'script_b';
+    // 일본어, 중국어는 발음(pronounce) 영역에, 나머지는 외국어 스크립트(script_foreign) 영역에 링크 생성
+    const targetId = (studyLang === 'japanese' || studyLang === 'chinese') ? 'pronounce' : 'script_foreign';
     const targetElement = document.getElementById(targetId);
 
     if (targetElement) {

@@ -452,8 +452,8 @@ async function toggleAllStop() {
     }
 
     btnPlayAll.textContent = "PLAY A";
-    document.getElementById('script_a_large').innerHTML = "";
-    document.getElementById('script_b_large').innerHTML = "";
+    document.getElementById('script_korean_large').innerHTML = "";
+    document.getElementById('script_foreign_large').innerHTML = "";
     document.getElementById('pronounce_large').innerHTML = "";
     document.getElementById('mp3b').innerHTML = "";
     document.getElementById('explain').innerHTML = "";
@@ -527,7 +527,7 @@ const playGroupMp3s = async () => {
                     playCount = defaultPlayCount;
                 }
                 document.getElementById('explain').innerHTML = "";
-                document.getElementById('script_a_llm').innerHTML = "";
+                document.getElementById('script_korean_llm').innerHTML = "";
                 currentSongPath = "/mp3/" + studyData[currStudyDataNum].mp3_foreign;
                 showPlayGroupDiscription();
                 if (!isSleepMode) {
@@ -546,7 +546,7 @@ const playGroupMp3s = async () => {
                     playCount = defaultPlayCount;
                 }
                 document.getElementById('explain').innerHTML = "";
-                document.getElementById('script_a_llm').innerHTML = "";
+                document.getElementById('script_korean_llm').innerHTML = "";
                 currentSongPath = "/mp3/" + studyData[currStudyDataNum].mp3_foreign;
                 showPlayGroupDiscriptionOff();
                 showPlayGroupDiscriptionFor();
@@ -630,26 +630,26 @@ async function playMp3(songPath){
 // showScriptModeKor -> 설정에서 한국어 보이기
 function showPlayGroupDiscriptionKor(){
     if(showScriptModeKor == true){
-        document.getElementById('script_a_large').innerHTML = studyData[currStudyDataNum].script_korean;
+        document.getElementById('script_korean_large').innerHTML = studyData[currStudyDataNum].script_korean;
     }else{
-        document.getElementById('script_a_large').innerHTML = "";
+        document.getElementById('script_korean_large').innerHTML = "";
     }
     
 }
 
 // 그룹 play에서 외국어어만 보여라. 
 function showPlayGroupDiscriptionFor(){
-    document.getElementById('script_b_large').innerHTML = studyData[currStudyDataNum].script_foreign;
+    document.getElementById('script_foreign_large').innerHTML = studyData[currStudyDataNum].script_foreign;
 }
 
 // 한국어 영어 다 보여라. 
 function showPlayGroupDiscription(){
     if(showScriptModeKor == true){
-        document.getElementById('script_a_large').innerHTML = studyData[currStudyDataNum].script_korean;
+        document.getElementById('script_korean_large').innerHTML = studyData[currStudyDataNum].script_korean;
     }else{
-        document.getElementById('script_a_large').innerHTML = "";
+        document.getElementById('script_korean_large').innerHTML = "";
     }
-    document.getElementById('script_b_large').innerHTML = studyData[currStudyDataNum].script_foreign;
+    document.getElementById('script_foreign_large').innerHTML = studyData[currStudyDataNum].script_foreign;
     // 발음 정보가 있으면 추가함. 
     if (studyData[currStudyDataNum].pronounce) {
         document.getElementById('pronounce_large').innerHTML = studyData[currStudyDataNum].pronounce;
@@ -665,14 +665,14 @@ function showPlayGroupDiscription(){
 
 // 한국어 영어 다 지워라.
 function showPlayGroupDiscriptionOff(){
-    document.getElementById('script_a_large').innerHTML = "";
-    document.getElementById('script_b_large').innerHTML = "";
+    document.getElementById('script_korean_large').innerHTML = "";
+    document.getElementById('script_foreign_large').innerHTML = "";
     document.getElementById('pronounce_large').innerHTML = "";
     document.getElementById('explain').innerHTML = "";
     document.getElementById('studyState').innerHTML = "";
     document.getElementById('mp3b').innerHTML = "mp3 : " + studyData[currStudyDataNum].mp3_foreign;
     document.getElementById('num').innerHTML = "";
-    document.getElementById('script_a_llm').innerHTML = "";
+    document.getElementById('script_korean_llm').innerHTML = "";
 }
 
 // 외국어 mp3를 play하는 기능 구현

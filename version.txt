@@ -154,11 +154,11 @@
 2. playmp3에서 mp3간 간격 값 range 변경
   - 기존 0.5초 ~ 1.5초 => 변경 0.0초 ~ 1.5초
   - 0으로 설정하면 바로 쉼 없이 play 됨
-3. script_a, script_b에 \n 이 있을 경우에 줄바꿈을 웹화면에서도 처리해줌
+3. script_korean, script_foreign에 \n 이 있을 경우에 줄바꿈을 웹화면에서도 처리해줌
   - p tag 에 스타일 추가 : style="white-space: pre-line;"
   - 아래 참조 : https://januaryman.tistory.com/240
-4. script_a에 정보가 없으면 표시 하지 않는 로직 추가
-  - if (studyData[currStudyDataNum].script_a) 추가함
+4. script_korean에 정보가 없으면 표시 하지 않는 로직 추가
+  - if (studyData[currStudyDataNum].script_korean) 추가함
   - KOR : undefined 로 표시되는 것 방지 
 
 ============   v1.62   ===========================
@@ -290,7 +290,7 @@
 4. PLAY R에서 count 숫자가 맞지 않는거 수정함
   - mp3 반복 play하는 함수에 updateTestCount(); 추가함. 
 5. 한자인 경우 폰트를 크게함  : 25 => 30
-  - document.getElementById('script_b').style.fontSize = "30px";
+  - document.getElementById('script_foreign').style.fontSize = "30px";
 
 ============   v1.74   ===========================
 1. 한자인 경우에 사전 링크에 밑줄을 치지 않도록 수정함
@@ -301,7 +301,7 @@
   - bold인 경우 한자 두께가 너무 두꺼워서 잘 안보임 
   - style에서 bold를 제거함
 4. 자막보기에서 한자인 경우 weight 를 bold체가 아니도록 변경함
-  - document.getElementById('script_b').style.fontWeight = "normal";  //이렇게 설정함
+  - document.getElementById('script_foreign').style.fontWeight = "normal";  //이렇게 설정함
 5. PLAY R, PLAY A에서 토글형 옵션 함수를 true/false로 변경하여 오류 수정
   - togglePlayCount();  ==> showPlayCount(true);
   - toggleForeignNoSoundLength(); ==> showForeignNoSoundLength(true);
@@ -400,15 +400,15 @@
   
 ============   v1.88  ===========================
 1. chapter인 경우에 script 폰트를 별도로 지정하고 이를 메모리에 저장함. 
-  - wordtest.js 파일에 전용 폰트값 설정 let script_b_Font = 20;
+  - wordtest.js 파일에 전용 폰트값 설정 let script_foreign_Font = 20;
   - showScriptOn()에서 if (studyLang == 'chapter') 인경우 폰트 별도 설정함
-    만약 null, 0인 경우  if(!script_b_Font) => default 값 지어하여 에러 처리 
+    만약 null, 0인 경우  if(!script_foreign_Font) => default 값 지어하여 에러 처리 
   - 폰트 +, - 버튼 누를때 chapterFontPlus(), chapterFontMinus()를 사용하여 폰트 조정함
-  - saveLocalStorage() 에 myChapterList[currChapterName].script_b_Font = script_b_Font; 추가함
-  - loadLocalStorage() 에 script_b_Font = myChapterList[currChapterName].script_b_Font; 추가함
+  - saveLocalStorage() 에 myChapterList[currChapterName].script_foreign_Font = script_foreign_Font; 추가함
+  - loadLocalStorage() 에 script_foreign_Font = myChapterList[currChapterName].script_foreign_Font; 추가함
 2. chapter의 경우 하단에 "복사" 버튼 추가함 => 챗GPT에 붙여넣기 용으로
   - index.html에 "복사" 버튼 추가
-  - wordtest.js에 function copyClipboard() 추가 => 클립보드에 script_b 복사
+  - wordtest.js에 function copyClipboard() 추가 => 클립보드에 script_foreign 복사
 3. 하단의 폰트설정, 번역, 복사 버튼 색상 변경
 
 ============   v1.90  ===========================
@@ -612,7 +612,7 @@
 4. button2th를 button2ea로 용어 변경함
 5. chapter 암기 완료시 암기 완료 메시지 표출 방식 변경
   - 기존 : alert로 표시하여 확인 버튼 눌러야 함. 
-  - 변경 : script_a 에 표시하여 버튼 누르지 않아도 되게 함.
+  - 변경 : script_korean 에 표시하여 버튼 누르지 않아도 되게 함.
 6. 사전찾기시 단어에 문장부호 있는것 제거하고 찾기 
   - dictionary.js에 const cleanWord = word.replace(/[,'"?!.]/g, ''); 추가함
 

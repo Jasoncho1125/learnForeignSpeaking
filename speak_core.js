@@ -1,5 +1,5 @@
 // 어플별로 수정할 변수 정리 : 여러개 공부시 서로 충돌 방지 
-// 엑셀 필수값 : num, mp3b, script_a, script_b, chapter
+// 엑셀 필수값 : num, mp3b, script_korean, script_foreign, chapter
 // 엑셀 옵션값 : pronounce, explain, mp3a, chapter, list
 
 let savePageTitle = CONFIG.savePageTitle;
@@ -44,7 +44,7 @@ let yesCountInChapter;  // Chapter에서 전체 암기 완료한 수
 let forNoSoundLength;  // mp3 전체 재생시에 외국어 mp3간 묵음 구간  => myChapterInfo
 let defaultFontSize; // 기본 폰트 사이즈 설정 => myChapterInfo
 let defaultDevideNum; // 기본적으로 그룹을 나누는 값  ==> myChapterInfo 에 저장
-let script_b_Font = 20; // chapter인 경우 글자를 크게하기 위하여 사용 => myChapterInfo
+let script_foreign_Font = 20; // chapter인 경우 글자를 크게하기 위하여 사용 => myChapterInfo
 let defaultPlayCount = 1; // 전체 재생시 외국어 반복 횟수 지정 (기본 1회)
 let studyDataVersion; // 현재 학습중인 stady Data의 Version 정보 저장 => myChapterInfo
 let studyCountInDay; // 날마다 몇번씩 공부를 했는지 mp3 재생 회수 저장 => myChapterInfo
@@ -96,6 +96,15 @@ async function initializeStudyData(value) {
 
             await checkChapter(); 
             myChapterListInfoMake(); 
+
+                // [수정] 현재 Book의 모든 챕터 완료 날짜 정보(finishDates) 및 히스토리 초기화
+                chapterStudyFinishDate = ""; 
+                chapterList.forEach(chap => {
+                    if (myChapterList && myChapterList[chap]) {
+                        myChapterList[chap].finishDates = "";
+                    }
+                });
+
             await groupReassign(); 
             currGroupNum = 1; 
             loadValue(currStudyDataNum); 
@@ -297,7 +306,7 @@ async function loadJsonFromFile() {
     foreignFirst = false; 
     forNoSoundLength = 1.0;
     defaultFontSize = 16;
-    script_b_Font = defaultFontSize; 
+    script_foreign_Font = defaultFontSize; 
     defaultDevideNum = 8;
     defaultPlayCount = 1;
     studyDataVersion = studyFileName;
@@ -440,7 +449,7 @@ function loadValue(currStudyDataNum) {
         showScriptOff();
     }
     // AI번역된 내용을 지운다. 
-    document.getElementById('script_a_llm').innerHTML = "";
+    document.getElementById('script_korean_llm').innerHTML = "";
     // 마지막 Group인 경우에는 나머지 값으로 progress 처리 해야 함
     if (studyData[currStudyDataNum].group == totalGroupCount) {
     } else {
@@ -464,7 +473,7 @@ function showKorScriptOnAndPlay() {
     if (isKorScriptShow == false) {
         // 한국어가 있으면 보여 주도록 처리함. 
         if (studyData[currStudyDataNum].script_korean) {
-            document.getElementById('script_a').innerHTML = studyData[currStudyDataNum].script_korean;
+            document.getElementById('script_korean').innerHTML = studyData[currStudyDataNum].script_korean;
             isKorScriptShow = true;
             // 한국어를 play 한다. 
             if (koreaPlay == true) {
@@ -472,7 +481,7 @@ function showKorScriptOnAndPlay() {
             }
         }
     } else {
-        document.getElementById('script_a').innerHTML = "";
+        document.getElementById('script_korean').innerHTML = "";
         isKorScriptShow = false;
     }
 }
@@ -482,11 +491,11 @@ function showKorScriptToggle() {
     if (isKorScriptShow == false) {
         // 한국어가 있으면 보여 주도록 처리함. 
         if (studyData[currStudyDataNum].script_korean) {
-            document.getElementById('script_a').innerHTML = studyData[currStudyDataNum].script_korean;
+            document.getElementById('script_korean').innerHTML = studyData[currStudyDataNum].script_korean;
             isKorScriptShow = true;
         }
     } else {
-        document.getElementById('script_a').innerHTML = "";
+        document.getElementById('script_korean').innerHTML = "";
         isKorScriptShow = false;
     }
 
@@ -496,13 +505,13 @@ function showKorScriptToggle() {
 function showKorScriptOn() {
     // 한국어가 있으면 보여 주도록 처리함. 
     if (studyData[currStudyDataNum].script_korean) {
-        document.getElementById('script_a').innerHTML = studyData[currStudyDataNum].script_korean;
+        document.getElementById('script_korean').innerHTML = studyData[currStudyDataNum].script_korean;
     }
 }
 
 // 한국어 자막을 안보이기 처리 
 function showKorScriptOff() {
-        document.getElementById('script_a').innerHTML = "";
+        document.getElementById('script_korean').innerHTML = "";
         isKorScriptShow = false;
 }
 
@@ -530,11 +539,11 @@ function showScriptOn() {
         showKorScriptToggle();
     }
     // 외국어 자막 보이기 
-    document.getElementById('script_b').innerHTML = studyData[currStudyDataNum].script_foreign;
+    document.getElementById('script_foreign').innerHTML = studyData[currStudyDataNum].script_foreign;
 
-    // [수정] studyLang 조건에 상관없이 사용자가 조정한 외국어 폰트 사이즈(script_b_Font)를 적용함
-    if (script_b_Font) {
-        document.getElementById('script_b').style.fontSize = script_b_Font + "px";
+    // [수정] studyLang 조건에 상관없이 사용자가 조정한 외국어 폰트 사이즈(script_foreign_Font)를 적용함
+    if (script_foreign_Font) {
+        document.getElementById('script_foreign').style.fontSize = script_foreign_Font + "px";
     }
 
     // 발음이 있으면 발음 추가함. 
@@ -556,12 +565,12 @@ function showScriptOn() {
     if (studyLang == 'hanja') {
         let hanjaFontSize = defaultFontSize + 20;
         let hanjaFont = hanjaFontSize + "px";
-        document.getElementById('script_a').style.fontSize = hanjaFont;
-        // document.getElementById('script_a').style.fontSize = "30px";
-        document.getElementById('script_a').style.fontWeight = "normal";
-        document.getElementById('script_b').style.fontSize = hanjaFont;
-        document.getElementById('script_b').style.fontWeight = "normal";
-        document.getElementById('script_b').style.color = "red";
+        document.getElementById('script_korean').style.fontSize = hanjaFont;
+        // document.getElementById('script_korean').style.fontSize = "30px";
+        document.getElementById('script_korean').style.fontWeight = "normal";
+        document.getElementById('script_foreign').style.fontSize = hanjaFont;
+        document.getElementById('script_foreign').style.fontWeight = "normal";
+        document.getElementById('script_foreign').style.color = "red";
     }
     // 설명이 있으면 설명 추가함. 
     if (studyData[currStudyDataNum].explain) {
@@ -586,8 +595,8 @@ function showScriptOff() {
     if (isKorScriptShow == true) {
         showKorScriptToggle();
     }
-    document.getElementById('script_a').innerHTML = "";
-    document.getElementById('script_b').innerHTML = "";
+    document.getElementById('script_korean').innerHTML = "";
+    document.getElementById('script_foreign').innerHTML = "";
     document.getElementById('pronounce').innerHTML = "";
     document.getElementById('explain').innerHTML = "";
     hideImage();
@@ -602,16 +611,16 @@ function showScriptOff() {
 function chapterFontPlus(){ // 자막 크기 확대
     //font_p_font_script++;
     //document.documentElement.style.setProperty('--font_p_font_script', font_p_font_script + 'px');
-    script_b_Font++;
+    script_foreign_Font++;
     saveToFirebase();
-    document.getElementById('script_b').style.fontSize = script_b_Font + "px";
+    document.getElementById('script_foreign').style.fontSize = script_foreign_Font + "px";
 }
 function chapterFontMinus(){ // // 자막 크기 축소
     // font_p_font_script--;
     // document.documentElement.style.setProperty('--font_p_font_script', font_p_font_script + 'px');
-    script_b_Font--;
+    script_foreign_Font--;
     saveToFirebase();
-    document.getElementById('script_b').style.fontSize = script_b_Font + "px";
+    document.getElementById('script_foreign').style.fontSize = script_foreign_Font + "px";
 }
 
 // Chapter에서 파파고 번역버튼 누르면 별도 웹페이지 실행
@@ -626,9 +635,9 @@ function transGoogle(){
     window.open("https://translate.google.co.kr/?hl=en&sl=en&tl=ko&text=" + encodedText, "_blank");
     //window.location.href = "https://papago.naver.com/?sk=en&tk=ko&st=" + encodedText;
 }
-// 클립보드로 script_b 를 복사함 => 챗gpt에 써 넣기 위함. 
+// 클립보드로 script_foreign 를 복사함 => 챗gpt에 써 넣기 위함. 
 function copyClipboard(){
-    let textScript = document.getElementById('script_b').innerText;
+    let textScript = document.getElementById('script_foreign').innerText;
     textScript = "아래 문장을 한글로 해석해 주세요\n" + textScript;
     if (navigator.clipboard) {
         navigator.clipboard.writeText(textScript).then(() => {
@@ -945,7 +954,7 @@ function finishAllComment() {
     showChapterStatus(); // 현재 공부하는 Chapter 현황을 제일 하단에 보여줌.
     
     let finishMessage = `"축하합니다. 당신은 ${currChapterName} Chapter에서 총 ${countAllInChapter(currChapterName)}개 중 ${countDeleteInChapter(currChapterName)}개를 삭제 완료하고,  ${countYesInChapter(currChapterName)}개의 단어(문장)을 모두 암기 했습니다."`;
-    document.getElementById('script_a').innerHTML = finishMessage;
+    document.getElementById('script_korean').innerHTML = finishMessage;
 
     //totalGroupCount = 0; // 모두 완료한 경우에 0으로 설정함
     countYesInChapter(currChapterName) // 현재 챕터의 finish 횟수 다시 세기. 
@@ -958,11 +967,11 @@ function finishGroupComment() {
     document.getElementById('num').innerHTML = "";
     document.getElementById('mp3b').innerHTML = "";
     document.getElementById('studyState').innerHTML = "현재 그룹의 모든 문장을 암기했습니다.";
-    document.getElementById('script_a').innerHTML = `<span style="color:blue; font-weight:bold;">[Group ${currGroupNum} 완료]</span><br>현재 그룹의 학습이 끝났습니다. 다른 그룹으로 이동하거나 그룹을 재조정하세요.`;
-    document.getElementById('script_b').innerHTML = "";
+    document.getElementById('script_korean').innerHTML = `<span style="color:blue; font-weight:bold;">[Group ${currGroupNum} 완료]</span><br>현재 그룹의 학습이 끝났습니다. 다른 그룹으로 이동하거나 그룹을 재조정하세요.`;
+    document.getElementById('script_foreign').innerHTML = "";
     document.getElementById('pronounce').innerHTML = "";
     document.getElementById('explain').innerHTML = "";
-    document.getElementById('script_a_llm').innerHTML = "";
+    document.getElementById('script_korean_llm').innerHTML = "";
     updateProgress(100);
     showCurrStudyBar(-1); // 바 초기화
 }
@@ -979,7 +988,7 @@ function deleteAllComment() {
     showChapterStatus(); // 현재 공부하는 Chapter 현황을 제일 하단에 보여줌.
     
     let finishMessage = `"${currChapterName}" Chapter의 총 ${countAllInChapter(currChapterName)} 개의 단어(문장)을 모두 삭제 완료 했습니다. 초기화 후 이용해 주세요.`;
-    document.getElementById('script_a').innerHTML = finishMessage;
+    document.getElementById('script_korean').innerHTML = finishMessage;
 
     //totalGroupCount = 0; // 모두 완료한 경우에 0으로 설정함
     countYesInChapter(currChapterName) // 현재 챕터의 finish 횟수 다시 세기. 
@@ -1030,7 +1039,7 @@ function saveToFirebase() {
 
     myChapterInfo.defaultFontSize = defaultFontSize || 16;
     myChapterInfo.defaultDevideNum = defaultDevideNum;
-    myChapterInfo.script_b_Font = script_b_Font || myChapterInfo.defaultFontSize; 
+    myChapterInfo.script_foreign_Font = script_foreign_Font || myChapterInfo.defaultFontSize; 
     myChapterInfo.defaultPlayCount = defaultPlayCount;
     myChapterInfo.studyDataVersion = studyFileName;
 
@@ -1086,7 +1095,7 @@ async function loadFromFirebase() {
     let savedIndex = myChapterInfo.currStudyDataNum;
     defaultFontSize = myChapterInfo.defaultFontSize;
     defaultDevideNum = myChapterInfo.defaultDevideNum;
-    script_b_Font = myChapterInfo.script_b_Font || (defaultFontSize + 4); // 저장된 값이 없으면 기본 오프셋 적용
+    script_foreign_Font = myChapterInfo.script_foreign_Font || (defaultFontSize + 4); // 저장된 값이 없으면 기본 오프셋 적용
     defaultPlayCount = myChapterInfo.defaultPlayCount;
     koreaPlay = myChapterInfo.koreaPlay;
     composeMode = myChapterInfo.composeMode;

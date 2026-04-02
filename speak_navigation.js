@@ -198,7 +198,7 @@ function nextValue(){
         showKorScriptToggle();  // 한국어 보이게 함. 
     }
     // AI번역기 내용 지우기
-    document.getElementById('script_a_llm').innerHTML = "";
+    document.getElementById('script_korean_llm').innerHTML = "";
         
 }
 
@@ -304,7 +304,7 @@ function prebValue(){
         showKorScriptToggle();  // 한국어 보이게 함. 
     }
     // AI번역기 내용 지우기
-    document.getElementById('script_a_llm').innerHTML = "";
+    document.getElementById('script_korean_llm').innerHTML = "";
 }
 
 // Helper function to find the first unfinished item in a chapter

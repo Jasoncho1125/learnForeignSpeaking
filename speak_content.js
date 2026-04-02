@@ -72,7 +72,7 @@ function myChapterInfoMake(){
         'forNoSoundLength' : forNoSoundLength,
         'defaultFontSize' : defaultFontSize,
         'defaultDevideNum' : defaultDevideNum,
-        'script_b_Font' : script_b_Font, // Use the global variable for initialization
+        'script_foreign_Font' : script_foreign_Font, // Use the global variable for initialization
         'defaultPlayCount' : defaultPlayCount,
         'studyDataVersion' : studyDataVersion,
         'studyCountInDay': {  // 날짜별 mp3 play한 회수 저장
