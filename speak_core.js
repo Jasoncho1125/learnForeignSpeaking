@@ -97,11 +97,12 @@ async function initializeStudyData(value) {
             await checkChapter(); 
             myChapterListInfoMake(); 
 
-                // [수정] 현재 Book의 모든 챕터 완료 날짜 정보(finishDates) 및 히스토리 초기화
+                // [수정] 현재 Book의 모든 챕터 완료 날짜 및 그룹 분할 정보 초기화
                 chapterStudyFinishDate = ""; 
                 chapterList.forEach(chap => {
                     if (myChapterList && myChapterList[chap]) {
                         myChapterList[chap].finishDates = "";
+                        myChapterList[chap].groupDevideNum = 5000; // 모든 챕터를 1개 그룹(All)으로 초기화
                     }
                 });
 
@@ -740,20 +741,49 @@ btnFinish.addEventListener('touchcancel', function() {
 // "완료" 버튼 롱 클릭 시 실행될 함수
 // 현재의 그룹에 대해서 모두 완료 처리를 한다. 
 async function changeToYesAllInGroup() {
-    // 모두 암기 완료된 상태이면 comment만 나오게 하고 종료한다. 
-    let count = 0;
     if(currGroupMemberArr.length === 0){
         showPopup("암기 대상이 없습니다. 초기화 후에 사용해 주세요.");
         return;
     }
+
+    let now = new Date();
+    let month = ("0" + (now.getMonth() + 1)).slice(-2);
+    let date = ("0" + now.getDate()).slice(-2);
+    let finish_date = month + '-' + date;
+    let todayKey = now.getFullYear() + '-' + month + '-' + date;
+
+    let count = 0;
+    // [수정] 루프 내부에서 loadValue를 호출하면 전역 변수가 변경되어 Book이 바뀌는 오류가 발생함.
+    // 또한 book_name 체크가 누락되어 다른 북의 동일한 챕터명(예: day01)을 처리하던 문제를 해결함.
     for (let i = 0; i < studyData.length; i++) {
-        if (studyData[i].chapter == currChapterName && studyData[i].group == currGroupNum &&(studyData[i].finish == 'no')) {
-            currStudyDataNum = i;
-            loadValue(currStudyDataNum);
-            await changeToYes();
+        if (studyData[i].book_name === currBookName && 
+            studyData[i].chapter_name === currChapterName && 
+            parseInt(studyData[i].group) === currGroupNum && 
+            studyData[i].finish === 'no') {
+            
+            studyData[i].finish = "yes";
+            studyData[i].finish_date = finish_date;
+            
+            // 일자별 학습 통계 업데이트
+            if (myChapterInfo && myChapterInfo.studyFinishCountInDay) {
+                myChapterInfo.studyFinishCountInDay[todayKey] = (myChapterInfo.studyFinishCountInDay[todayKey] || 0) + 1;
+            }
             count++;
         }
     }
+
+    // 현재 그룹 관리 상태 초기화 및 저장
+    currGroupMemberArr = [];
+    noCountInGroup = 0;
+    saveToFirebase();
+
+    // 화면 UI 업데이트: 챕터 전체 완료 여부에 따라 메시지 처리
+    if (countNoInChapter(currChapterName) === 0) {
+        finishAllComment();
+    } else {
+        finishGroupComment();
+    }
+
     showPopup(`총 ${count}개가 모두 완료 처리되었습니다.`);
 }
 
