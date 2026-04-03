@@ -93,6 +93,15 @@ async function changeBook() {
         // 북 이름 변경 시 Firebase에서 데이터를 다시 불러와야 하므로 loadLocalStorage를 호출합니다.
         currBookName = selectedBookName;
         
+        // [수정] Firebase에서 새롭게 선택된 Book의 myChapterList 데이터를 불러와 동기화합니다.
+        const user = firebase.auth().currentUser;
+        if (user) {
+            const snapshot = await firebase.database()
+                .ref(`users/${user.uid}/${CONFIG.studySaveName}/books/${currBookName}/myChapterList`)
+                .once('value');
+            myChapterList = snapshot.val() || {};
+        }
+
         // [수정] UID 히스토리를 확인하여 정확한 인덱스 찾기
         let lastUid = (myChapterInfo.lastStudyNumPerBook) ? myChapterInfo.lastStudyNumPerBook[selectedBookName] : undefined;
         let foundIndex = -1;
@@ -165,11 +174,13 @@ async function selectBook() {
         }).join('');
 
         const modalHtml = `
-            <div id="selectBookModalOverlay" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); display: flex; justify-content: center; align-items: center; z-index: 2000;">
-                <div style="background: white; padding: 20px; border-radius: 8px; width: 80%; max-width: 300px; max-height: 70vh; overflow-y: auto;">
-                    <p style="font-weight: bold; margin-bottom: 15px;">공부할 Book을 선택하세요</p>
-                    ${radioButtonsHtml}
-                    <div style="display: flex; justify-content: center; gap: 10px; margin-top: 20px;">
+            <div id="selectBookModalOverlay" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); display: flex; justify-content: center; align-items: center; z-index: 2000; padding: 20px;">
+                <div style="background: white; padding: 20px; border-radius: 8px; width: 100%; max-width: 320px; max-height: 85vh; display: flex; flex-direction: column; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);">
+                    <p style="font-weight: bold; margin-bottom: 15px; flex-shrink: 0;">공부할 Book을 선택하세요</p>
+                    <div style="overflow-y: auto; flex: 1; margin-bottom: 15px;">
+                        ${radioButtonsHtml}
+                    </div>
+                    <div style="display: flex; justify-content: center; gap: 10px; flex-shrink: 0; padding-top: 10px; border-top: 1px solid #eee;">
                         <button id="bookConfirm" class="button2ea btn_color6">확인</button>
                         <button id="bookCancel" class="button2ea btn_color3">취소</button>
                     </div>
@@ -344,12 +355,13 @@ async function selectChapter() {
         }).join('');
 
         const modalHtml = `
-            <div id="selectChapterModalOverlay" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); display: flex; justify-content: center; align-items: center; z-index: 2000;">
-                <div style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); max-height: 80vh; overflow-y: auto;">
-                    <p>공부하려는 Chapter을 선택하세요</p>
-                    ${radioButtonsHtml}
-                    <br><br>
-                    <div class="button-container" style="display: flex; justify-content: center; gap: 10px;">
+            <div id="selectChapterModalOverlay" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); display: flex; justify-content: center; align-items: center; z-index: 2000; padding: 20px;">
+                <div style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); width: 100%; max-width: 400px; max-height: 85vh; display: flex; flex-direction: column;">
+                    <p style="font-weight: bold; margin-bottom: 15px; flex-shrink: 0;">공부하려는 Chapter을 선택하세요</p>
+                    <div style="overflow-y: auto; flex: 1; margin-bottom: 15px;">
+                        ${radioButtonsHtml}
+                    </div>
+                    <div class="button-container" style="display: flex; justify-content: center; gap: 10px; flex-shrink: 0; padding-top: 10px; border-top: 1px solid #eee;">
                         <button id="selectChapterConfirm" class="button4ea btn_color2">확인</button>
                         <button id="selectChapterCancel" class="button4ea btn_color2">취소</button>
                     </div>
@@ -781,13 +793,14 @@ async function getGroupReassignValue() {
         }).join('');
 
         const modalHtml = `
-            <div id="groupReassignModal" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); display: flex; justify-content: center; align-items: center; z-index: 1000;">
-                <div style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
-                    <p>그룹 재조정할 값을 선택하세요</p>
-                    <p>${currChapterInfo}</p>
-                    ${radioButtonsHtml}
-                    <br><br>
-                    <div class="button-container" style="display: flex; justify-content: center; gap: 10px;">
+            <div id="groupReassignModal" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); display: flex; justify-content: center; align-items: center; z-index: 1000; padding: 20px;">
+                <div style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); width: 100%; max-width: 350px; max-height: 85vh; display: flex; flex-direction: column;">
+                    <p style="font-weight: bold; margin-bottom: 5px; flex-shrink: 0;">그룹 재조정할 값을 선택하세요</p>
+                    <p style="font-size: 0.9em; color: #666; margin-bottom: 15px; flex-shrink: 0;">${currChapterInfo}</p>
+                    <div style="overflow-y: auto; flex: 1; margin-bottom: 15px;">
+                        ${radioButtonsHtml}
+                    </div>
+                    <div class="button-container" style="display: flex; justify-content: center; gap: 10px; flex-shrink: 0; padding-top: 10px; border-top: 1px solid #eee;">
                         <button id="groupReassignConfirm" class="button4ea btn_color2">확인</button>
                         <button id="groupReassignCancel" class="button4ea btn_color2">취소</button>
                     </div>

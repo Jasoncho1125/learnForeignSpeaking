@@ -164,18 +164,19 @@ function getInitializeValue() {
     return new Promise((resolve) => {
         // 모달 HTML을 동적으로 생성
         const modalHtml = `
-            <div id="customModal" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); display: flex; justify-content: center; align-items: center; z-index: 1000;">
-                <div style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
-                    <p>초기화할 대상을 선택하세요</p>
-                    <label><input style="margin-bottom: 12px" type="radio" name="value" value="1"> 1. 현재 Book의 모든 Chapter 초기화</label><br>
-                    <label><input style="margin-bottom: 12px" type="radio" name="value" value="2" checked> 2. 현재 Chapter 초기화(암기제외 유지)</label><br>
-                    <label><input style="margin-bottom: 12px" type="radio" name="value" value="3"> 3. 현재 Chapter 초기화(암기제외도 초기화)</label><br>
-                    <label><input style="margin-bottom: 12px" type="radio" name="value" value="4"> 4. Chapter 전체를 하나의 Chapter로 합치기</label><br>
-                    <label><input style="margin-bottom: 12px" type="radio" name="value" value="5"> 5. 원래의 Chapter로 되돌리기</label><br>
-                    <label><input style="margin-bottom: 12px" type="radio" name="value" value="6"> 6. 현재 Group 초기화(암기제외 유지)</label><br>
-                    <label><input style="margin-bottom: 12px" type="radio" name="value" value="7"> 7. 전체 Group 초기화(암기제외 유지)</label><br>
-                    <br>
-                    <div class="button-container" style="display: flex; justify-content: center; gap: 10px;">
+            <div id="customModal" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); display: flex; justify-content: center; align-items: center; z-index: 1000; padding: 20px;">
+                <div style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); width: 100%; max-width: 350px; max-height: 85vh; display: flex; flex-direction: column;">
+                    <p style="font-weight: bold; margin-bottom: 15px; flex-shrink: 0;">초기화할 대상을 선택하세요</p>
+                    <div style="overflow-y: auto; flex: 1; margin-bottom: 15px;">
+                        <label style="display: block; margin-bottom: 12px;"><input type="radio" name="value" value="1"> 1. 현재 Book의 모든 Chapter 초기화</label>
+                        <label style="display: block; margin-bottom: 12px;"><input type="radio" name="value" value="2" checked> 2. 현재 Chapter 초기화(암기제외 유지)</label>
+                        <label style="display: block; margin-bottom: 12px;"><input type="radio" name="value" value="3"> 3. 현재 Chapter 초기화(암기제외도 초기화)</label>
+                        <label style="display: block; margin-bottom: 12px;"><input type="radio" name="value" value="4"> 4. Chapter 전체를 하나의 Chapter로 합치기</label>
+                        <label style="display: block; margin-bottom: 12px;"><input type="radio" name="value" value="5"> 5. 원래의 Chapter로 되돌리기</label>
+                        <label style="display: block; margin-bottom: 12px;"><input type="radio" name="value" value="6"> 6. 현재 Group 초기화(암기제외 유지)</label>
+                        <label style="display: block; margin-bottom: 12px;"><input type="radio" name="value" value="7"> 7. 전체 Group 초기화(암기제외 유지)</label>
+                    </div>
+                    <div class="button-container" style="display: flex; justify-content: center; gap: 10px; flex-shrink: 0; padding-top: 10px; border-top: 1px solid #eee;">
                         <button id="modalConfirm" class="button4ea btn_color2">확인</button>
                         <button id="modalCancel" class="button4ea btn_color2">취소</button>
                     </div>
@@ -1074,6 +1075,10 @@ function saveToFirebase() {
     myChapterInfo.studyDataVersion = studyFileName;
 
     if (currChapterName && myChapterList[currChapterName]) {
+        // [보완] 저장 직전 전역 변수의 날짜 정보를 객체에 반영하여 데이터 유실 방지
+        if (chapterStudyFinishDate !== undefined) {
+            myChapterList[currChapterName].finishDates = chapterStudyFinishDate;
+        }
         myChapterList[currChapterName].yesNoCountInChapter = yesNoCountInChapter;
 
         myChapterList[currChapterName].finishDates = chapterStudyFinishDate;
