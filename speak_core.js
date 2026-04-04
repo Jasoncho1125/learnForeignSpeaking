@@ -435,21 +435,16 @@ function loadValue(currStudyDataNum) {
         + countYesInChapter(currChapterName) + "/"
         + countNoInChapter(currChapterName) + " ➤ "
         + ((countDeleteInChapter(currChapterName) / countAllInChapter(currChapterName)) * 100).toFixed(1) + "%";
-    //myAudio.src = "/mp3/" + studyData[currStudyDataNum].mp3b;
-    isScriptShow = true; // 자막이 켜지고, 꺼지게 설정하는 값
-    if(studyLang != "song"){  // 노래모드가 아니면 
-        showScriptOff();  // script를 보이지 않게 함. 
-    }else{
-        showScriptOn(); // 노래모드이면 script를 항상 보여줌
-    }
-    if(studyLang == "korea"){  // 한국어 모드이면 
-        showKorScriptToggle();  // 한국어 보이게 함. 
-    }
-    if(showScriptMode == true){
+    // [수정] 자막 버튼 텍스트 및 표시 상태 동기화 (설정값 기반)
+    const btnScript = document.getElementById('btn_script');
+    if (btnScript) btnScript.textContent = showScriptMode ? "자막ON" : "자막OFF";
+
+    if (showScriptMode === true || studyLang === "song") {
         showScriptOn();
-    }else{
+    } else {
         showScriptOff();
     }
+
     // AI번역된 내용을 지운다. 
     document.getElementById('script_korean_llm').innerHTML = "";
     // 마지막 Group인 경우에는 나머지 값으로 progress 처리 해야 함
@@ -518,15 +513,19 @@ function showKorScriptOff() {
 }
 
 
-// "자막" 버튼 클릭시 동작 : 자막 보이기/안보이기 토글 처리
+// [수정] "자막" 버튼 클릭시 모드 전환 및 자막 보이기/안보이기 토글
 let isScriptShow = false; // 자막이 켜지고, 꺼진 상태롤 설정하는 값
 function showScript() {
-    // 지금 스트립트가 안보이면 보이게 하고
-    if (isScriptShow == false) {
+    showScriptMode = !showScriptMode; // 전역 설정 토글
+    const btnScript = document.getElementById('btn_script');
+    if (btnScript) btnScript.textContent = showScriptMode ? "자막ON" : "자막OFF";
+
+    if (showScriptMode) {
         showScriptOn();
-    } else { 
+    } else {
         showScriptOff();
     }
+    saveToFirebase();
 }
 // 자막을 보이면서 외국어 play 하기 
 function showScriptOnAndPlayMp3B() {
@@ -1134,7 +1133,10 @@ async function loadFromFirebase() {
     defaultPlayCount = myChapterInfo.defaultPlayCount;
     koreaPlay = myChapterInfo.koreaPlay;
     composeMode = myChapterInfo.composeMode;
-    showScriptMode = myChapterInfo.showScriptMode;
+    showScriptMode = (myChapterInfo.showScriptMode !== undefined) ? myChapterInfo.showScriptMode : true;
+    
+    const btnScript = document.getElementById('btn_script');
+    if (btnScript) btnScript.textContent = showScriptMode ? "자막ON" : "자막OFF";
     showScriptModeKor = myChapterInfo.showScriptModeKor;
     mp3PlayMode = myChapterInfo.mp3PlayMode;
     foreignFirst = myChapterInfo.foreignFirst;

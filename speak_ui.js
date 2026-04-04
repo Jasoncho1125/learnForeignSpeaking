@@ -132,13 +132,10 @@ function toggleShowScriptSwitchElement() {
 // show script 스위치 값 선택 및 저장 
 function toggleShowScriptSwitch() {
     const checkbox = document.getElementById('id_showscript');
-    showScriptSwitchShow = checkbox.checked;
-    if (showScriptSwitchShow) {
-        showScriptMode = true;
-    } else {
-        showScriptMode = false;
-    }
-    saveToFirebase(); // 변경된 composeMode 정보를 저장한다. 
+    showScriptMode = checkbox.checked;
+    const btnScript = document.getElementById('btn_script');
+    if (btnScript) btnScript.textContent = showScriptMode ? "자막ON" : "자막OFF";
+    saveToFirebase(); 
 }
 
 
