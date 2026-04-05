@@ -24,8 +24,14 @@ function showDictionaryWord(sentence) {
 // Function to open Naver dictionary with the selected word
 // 영어와 한자에 대해서 각각 사전 연동 처리함. 
 function openDictionary(word) {
-    // studyLang 값에 따라 CONFIG에서 설정을 가져옴
-    const dict = CONFIG.DICTIONARIES[studyLang] || CONFIG.DICTIONARIES.default;
+    // studyLang 값에 따라 CONFIG에서 설정을 가져옴 (영어의 경우 영한/영영 구분)
+    let dict;
+    if (studyLang === 'english' && englishDictType === 'enEn') {
+        dict = CONFIG.DICTIONARIES.englishEnEn;
+    } else {
+        dict = CONFIG.DICTIONARIES[studyLang] || CONFIG.DICTIONARIES.default;
+    }
+    
     const url = dict.baseUrl + encodeURIComponent(word);
     // '_blank' 대신 고정된 이름('speak_dictionary')을 사용하여 열려있는 창을 재사용합니다.
     window.open(url, 'speak_dictionary');

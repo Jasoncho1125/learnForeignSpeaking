@@ -20,6 +20,7 @@ let koreaPlay;  // 한국어 mp3가 있을 경우에 한국어도 play 해주는
 let composeMode; // 한국어를 보고 외국어를 생각해내는 모드. 자동 mp3 Play를 하지 않음.
 let mp3PlayMode; // 1곡을 play하는 모드에서 이 모드가 off이면 mp3를 play하지 않음. => 읽기 모드로 사용시 설정함. 
 let foreignFirst; // Play A 모드에서 외국어를 먼저 play 할지 지정하는 옵션값. 
+let englishDictType = "enKo"; // 영어사전 타입 (enKo: 영한, enEn: 영영)
 
 // =====================================================================
 // studyData[i].finish == 'no'  ==> 암기 대상 : countNoInChapter(chapterName)
@@ -306,6 +307,7 @@ async function loadJsonFromFile() {
     showScriptModeKor = true;
     mp3PlayMode = true; 
     foreignFirst = false; 
+    englishDictType = "enKo";
     forNoSoundLength = 1.0;
     defaultFontSize = 16;
     script_foreign_Font = defaultFontSize; 
@@ -1065,6 +1067,7 @@ function saveToFirebase() {
     myChapterInfo.showScriptModeKor = (showScriptModeKor !== undefined) ? showScriptModeKor : true;
     myChapterInfo.mp3PlayMode = mp3PlayMode;
     myChapterInfo.foreignFirst = foreignFirst;
+    myChapterInfo.englishDictType = englishDictType || "enKo";
     myChapterInfo.forNoSoundLength = forNoSoundLength;
 
     myChapterInfo.defaultFontSize = defaultFontSize || 16;

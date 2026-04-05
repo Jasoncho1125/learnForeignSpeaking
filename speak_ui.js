@@ -53,6 +53,9 @@ function toggleSettings() {
         document.getElementById('compose').checked = composeMode;
         document.getElementById('foreign_first').checked = foreignFirst;
         
+        // 영어사전 타입 라디오 버튼 동기화
+        document.querySelector(`input[name="enDictSelect"][value="${englishDictType || 'enKo'}"]`).checked = true;
+        
         settingsContainer.style.display = 'block';
         btn_setting.textContent = "설정닫기";
     }
@@ -224,6 +227,13 @@ function toggleForeignFirstSwitch() {
         foreignFirst = false;
     }
     saveToFirebase(); // 변경된 foreignFirst 정보를 저장한다. 
+}
+
+// 영어사전 타입 변경 및 저장
+function toggleEnglishDictType() {
+    const selectedValue = document.querySelector('input[name="enDictSelect"]:checked').value;
+    englishDictType = selectedValue;
+    saveToFirebase();
 }
 
 // // AI 번역기를 선택하는 스위치

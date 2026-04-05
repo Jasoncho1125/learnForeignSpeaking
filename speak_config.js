@@ -6,13 +6,17 @@ const CONFIG = {
     savePageTitle: "Foreign Speaking",
     studyFileName: 'studySpeakingData-v0.5.json',
     studySaveName: 'ForeignSpeaking',
-    version: "v0.11",
+    version: "v0.12",
 
     // 사전 연동 정보 (language -> 사전 URL 기본 경로)
     DICTIONARIES: {
         english: {
             name: 'Naver English',
             baseUrl: 'https://dict.naver.com/enkodict/#/search?query='
+        },
+        englishEnEn: {
+            name: 'Naver English-English',
+            baseUrl: 'https://english.dict.naver.com/english-dictionary/#/search?query='
         },
         spanish: {
             name: 'Naver Espanol',

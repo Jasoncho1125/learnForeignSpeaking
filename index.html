@@ -118,6 +118,11 @@
                 <span class="slider_check round"></span>
             </label>
         </div>
+        <div class="settings" id="endict_type">
+            <label>영어사전 : </label>
+            <label style="margin-left: 10px;"><input type="radio" name="enDictSelect" value="enKo" onclick="toggleEnglishDictType()"> 영한</label>
+            <label style="margin-left: 10px;"><input type="radio" name="enDictSelect" value="enEn" onclick="toggleEnglishDictType()"> 영영</label>
+        </div>
         <div class="settings" id="foreign_font_settings" style="margin-top: 10px; text-align: center; display: flex; justify-content: center; gap: 5px;">
             <button class="button2ea btn_color4" id="btn_font_minus" onclick="chapterFontMinus()" style="font-size: 0.9em; padding: 10px 5px;">외국어폰트 -</button>
             <button class="button2ea btn_color4" id="btn_font_plus" onclick="chapterFontPlus()" style="font-size: 0.9em; padding: 10px 5px;">외국어폰트 +</button>
