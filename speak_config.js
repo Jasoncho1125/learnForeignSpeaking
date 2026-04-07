@@ -2,11 +2,23 @@
  * speak_config.js
  * 앱의 전역 설정 및 사전 연동 정보를 관리합니다.
  */
+
+// studyFileName에서 버전을 추출하여 studySaveName을 동적으로 생성하는 함수
+function getStudySaveName(studyFileName) {
+    const versionMatch = studyFileName.match(/-v(\d+)\.(\d+)\.json$/);
+    if (versionMatch) {
+        return `ForeignSpeaking-v${versionMatch[1]}${versionMatch[2]}`;
+    }
+    return 'ForeignSpeaking'; // 기본값
+}
+
 const CONFIG = {
     savePageTitle: "Foreign Speaking",
-    studyFileName: 'studySpeakingData-v0.6.json',
-    studySaveName: 'ForeignSpeaking',
-    version: "v0.13",
+    studyFileName: 'studySpeakingData-v0.9.json',
+    get studySaveName() {
+        return getStudySaveName(this.studyFileName);
+    },
+    version: "v0.14",
 
     // 사전 연동 정보 (language -> 사전 URL 기본 경로)
     DICTIONARIES: {

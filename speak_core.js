@@ -552,6 +552,8 @@ function showScriptOn() {
     // 발음이 있으면 발음 추가함. 
     if (studyData[currStudyDataNum].pronounce) {
         document.getElementById('pronounce').innerHTML = studyData[currStudyDataNum].pronounce;
+    } else {
+        document.getElementById('pronounce').innerHTML = "";
     }
     // 언어가 영어나 한자이면 단어 터치시 네이버 사전으로 연동하도록 구현. 
     if (studyLang == 'english' || studyLang == 'spanish' || studyLang == 'hanja' || studyLang == 'chapter') {
@@ -1155,8 +1157,14 @@ async function loadFromFirebase() {
     studyData = baseData.map(baseItem => {
         const progress = progressData.find(p => p.uid === baseItem.uid);
         if (progress) {
-            // 서버에 저장된 진행 상황 병합
-            return { ...baseItem, ...progress };
+            // 학습 정보(진행 상황)만 유지하고 JSON 파일의 변경사항 반영
+            const progressInfo = {
+                finish: progress.finish,
+                finish_date: progress.finish_date,
+                test_count: progress.test_count,
+                group: progress.group
+            };
+            return { ...baseItem, ...progressInfo };
         }
         // 진행 상황이 없는 경우, 기본값으로 초기화
         return {
