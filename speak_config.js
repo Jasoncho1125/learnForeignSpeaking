@@ -18,7 +18,7 @@ const CONFIG = {
     get studySaveName() {
         return getStudySaveName(this.studyFileName);
     },
-    version: "v0.14",
+    version: "v0.15",
 
     // 사전 연동 정보 (language -> 사전 URL 기본 경로)
     DICTIONARIES: {

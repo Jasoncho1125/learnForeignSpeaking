@@ -80,38 +80,41 @@ async function initializeStudyData(value) {
     if (initializeValue !== "cancel") {
         // 1.전체 초기화 수행
         if(initializeValue == 1){
-            // 현재 Book에 속한 모든 항목의 진행 상황을 초기화합니다.
-            for (let i = 0; i < studyData.length; i++) {
-                if (studyData[i].book_name === currBookName) {
-                    studyData[i].finish = "no";
-                    studyData[i].finish_date = "";
-                    studyData[i].group = 1; 
-                    studyData[i].test_count = 0;
-                }
-            }
-
-            // 현재 Book의 첫 번째 항목으로 이동
-            const firstIdx = studyData.findIndex(item => item.book_name === currBookName);
-            currStudyDataNum = firstIdx !== -1 ? firstIdx : 0;
-            currChapterName = studyData[currStudyDataNum].chapter_name;
-
-            await checkChapter(); 
-            myChapterListInfoMake(); 
-
-                // [수정] 현재 Book의 모든 챕터 완료 날짜 및 그룹 분할 정보 초기화
-                chapterStudyFinishDate = ""; 
-                chapterList.forEach(chap => {
-                    if (myChapterList && myChapterList[chap]) {
-                        myChapterList[chap].finishDates = "";
-                        myChapterList[chap].groupDevideNum = 5000; // 모든 챕터를 1개 그룹(All)으로 초기화
+            // 확인 팝업을 띄움
+            showConfirmationModal("현재 Book의 모든 학습 이력이 초기화 됩니다. 진행하시겠습니까?", async () => {
+                // 현재 Book에 속한 모든 항목의 진행 상황을 초기화합니다.
+                for (let i = 0; i < studyData.length; i++) {
+                    if (studyData[i].book_name === currBookName) {
+                        studyData[i].finish = "no";
+                        studyData[i].finish_date = "";
+                        studyData[i].group = 1; 
+                        studyData[i].test_count = 0;
                     }
-                });
+                }
 
-            await groupReassign(); 
-            currGroupNum = 1; 
-            loadValue(currStudyDataNum); 
-            saveToFirebase(); 
-            showPopup(`현재 Book의 모든 Chapter를 초기화했습니다.`);
+                // 현재 Book의 첫 번째 항목으로 이동
+                const firstIdx = studyData.findIndex(item => item.book_name === currBookName);
+                currStudyDataNum = firstIdx !== -1 ? firstIdx : 0;
+                currChapterName = studyData[currStudyDataNum].chapter_name;
+
+                await checkChapter(); 
+                myChapterListInfoMake(); 
+
+                    // [수정] 현재 Book의 모든 챕터 완료 날짜 및 그룹 분할 정보 초기화
+                    chapterStudyFinishDate = ""; 
+                    chapterList.forEach(chap => {
+                        if (myChapterList && myChapterList[chap]) {
+                            myChapterList[chap].finishDates = "";
+                            myChapterList[chap].groupDevideNum = 5000; // 모든 챕터를 1개 그룹(All)으로 초기화
+                        }
+                    });
+
+                await groupReassign(); 
+                currGroupNum = 1; 
+                loadValue(currStudyDataNum); 
+                saveToFirebase(); 
+                showPopup(`현재 Book의 모든 Chapter를 초기화했습니다.`);
+            });
         }
         // 2.현재 Chapter을 초기화하기(암기제외는 그대로 유지)
         if(initializeValue == 2){
