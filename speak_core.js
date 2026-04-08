@@ -541,8 +541,12 @@ function showScriptOnAndPlayMp3B() {
 // 한국어, 외국어 자막을 모두 보이게 한다. 
 function showScriptOn() {
     // 한국어 자막 보이기
-    if (isKorScriptShow == false) {
-        showKorScriptToggle();
+    if (studyData[currStudyDataNum].script_korean) {
+        document.getElementById('script_korean').innerHTML = studyData[currStudyDataNum].script_korean;
+        isKorScriptShow = true;
+    } else {
+        document.getElementById('script_korean').innerHTML = "";
+        isKorScriptShow = false;
     }
     // 외국어 자막 보이기 
     document.getElementById('script_foreign').innerHTML = studyData[currStudyDataNum].script_foreign;
