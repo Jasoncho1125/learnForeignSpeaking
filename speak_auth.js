@@ -4,7 +4,7 @@
  */
 
 // 로그인 상태 변화 감시
-firebase.auth().onAuthStateChanged((user) => {
+firebase.auth().onAuthStateChanged(async (user) => {
     const authUi = document.getElementById('auth-ui');
     if (!authUi) return;
 
@@ -17,6 +17,13 @@ firebase.auth().onAuthStateChanged((user) => {
                 <i class="fa-solid fa-right-from-bracket logout-icon" onclick="handleLogout()" title="로그아웃"></i>
             </div>
         `;
+        
+        // 구 데이터 구조 마이그레이션 (최초 로그인 시에만 수행)
+        try {
+            await migrateOldUserData(user);
+        } catch (error) {
+            console.error("Migration failed:", error);
+        }
     } else {
         // 로그아웃 된 상태
         authUi.innerHTML = `

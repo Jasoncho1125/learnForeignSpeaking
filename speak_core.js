@@ -586,6 +586,14 @@ function showScriptOn() {
         document.getElementById('script_foreign').style.fontSize = hanjaFont;
         document.getElementById('script_foreign').style.fontWeight = "normal";
         document.getElementById('script_foreign').style.color = "red";
+    } else {
+        // 한자가 아닌 경우 원래 폰트 사이즈로 리셋
+        let defaultFont = defaultFontSize + "px";
+        document.getElementById('script_korean').style.fontSize = defaultFont;
+        document.getElementById('script_korean').style.fontWeight = "";
+        document.getElementById('script_foreign').style.fontSize = script_foreign_Font + "px";
+        document.getElementById('script_foreign').style.fontWeight = "";
+        document.getElementById('script_foreign').style.color = "";
     }
     // 설명이 있으면 설명 추가함. 
     if (studyData[currStudyDataNum].explain) {
@@ -602,6 +610,9 @@ function showScriptOn() {
     if (studyData[currStudyDataNum].image) {
         let src = "/image/" + studyData[currStudyDataNum].image;
         showImage(src);
+    } else {
+        // 이미지가 없으면 숨겨라.
+        hideImage();
     }
     isScriptShow = true;
 }
@@ -1102,17 +1113,216 @@ function saveToFirebase() {
     }
 
     if (user) {
-        const db = firebase.database();
-        const basePath = `users/${user.uid}/${studySaveName}`;
+        const currentTimestamp = Date.now();
         
-        // 성능을 위해 한 번에 업데이트
+        // 타임스탬프 기반 진행 상황 데이터 (충돌 해결용)
+        const progressData = studyData.map(item => ({
+            uid: item.uid,
+            finish: item.finish,
+            finish_date: item.finish_date,
+            group: item.group,
+            test_count: item.test_count,
+            lastModified: currentTimestamp  // 타임스탬프 추가
+        }));
+
+        const db = firebase.database();
+        const basePath = `users/${user.uid}`;
+        
+        // 성능을 위해 한 번에 업데이트 (버전 정보 포함)
         db.ref(basePath).update({
-            studyData: studyData,
-            myChapterInfo: myChapterInfo,
+            progress: progressData,
+            myChapterInfo: {
+                ...myChapterInfo,
+                currentVersion: studyFileName,  // 현재 버전 기록
+                lastSyncTimestamp: currentTimestamp
+            },
             // myChapterList는 Book별로 별도 경로에 저장
             [`books/${currBookName || 'Default'}/myChapterList`]: myChapterList
         }).catch(err => console.error("Firebase Save Error:", err));
     }
+}
+
+async function loadStudyContent() {
+    const db = firebase.database();
+    
+    // 단일 studyFiles/content에서 로드 (모든 버전 콘텐츠 통합)
+    const snapshot = await db.ref('studyFiles/content').once('value');
+    const sharedData = snapshot.val();
+    if (sharedData && Array.isArray(sharedData)) {
+        return sharedData;
+    }
+    
+    // DB에 없으면 JSON 파일에서 로드
+    const response = await fetch(studyFileName);
+    return await response.json();
+}
+
+async function updateSharedStudyContentIfNeeded(previousVersion) {
+    const db = firebase.database();
+    const metadataRef = db.ref('studyFiles/metadata');
+    const contentRef = db.ref('studyFiles/content');
+    
+    // 메타데이터 가져오기
+    const metadataSnapshot = await metadataRef.once('value');
+    const metadata = metadataSnapshot.val() || { latest_version: null, version_history: [] };
+    
+    // 버전이 변경되었는지 확인
+    if (metadata.latest_version === studyFileName) {
+        return; // 이미 최신 버전
+    }
+    
+    // 새로운 콘텐츠 로드
+    const response = await fetch(studyFileName);
+    const newContent = await response.json();
+    
+    // 기존 콘텐츠 가져오기
+    const contentSnapshot = await contentRef.once('value');
+    const existingContent = contentSnapshot.val() || [];
+    
+    // UID 기반으로 새 콘텐츠 병합 (기존 데이터는 유지)
+    const mergedContent = mergeContentByUID(existingContent, newContent, studyFileName);
+    
+    // DB에 저장
+    await contentRef.set(mergedContent);
+    
+    // 메타데이터 업데이트
+    if (!metadata.version_history.includes(studyFileName)) {
+        metadata.version_history.push(studyFileName);
+    }
+    metadata.latest_version = studyFileName;
+    metadata.lastUpdateTime = Date.now();
+    
+    await metadataRef.set(metadata);
+}
+
+// UID 기반으로 콘텐츠 병합 (새 버전 콘텐츠에 버전 정보 추가)
+function mergeContentByUID(existingContent, newContent, version) {
+    const existingMap = new Map(existingContent.map(item => [item.uid, item]));
+    
+    const merged = newContent.map(newItem => {
+        const existing = existingMap.get(newItem.uid);
+        return {
+            ...newItem,
+            version_introduced: existing?.version_introduced || version,  // 처음 도입된 버전 기록
+            lastUpdated: Date.now()
+        };
+    });
+    
+    // 새 버전에서 제거된 항목 유지 (삭제 플래그 추가)
+    existingContent.forEach(existingItem => {
+        if (!newContent.find(newItem => newItem.uid === existingItem.uid)) {
+            merged.push({
+                ...existingItem,
+                isDeleted: true,  // 콘텐츠 삭제 플래그
+                deletedVersion: version,
+                lastUpdated: Date.now()
+            });
+        }
+    });
+    
+    return merged;
+}
+
+// UID 마이그레이션: 이전 버전 진행 정보를 새 버전 콘텐츠와 매칭하기 위한 보조 함수
+function matchProgressToNewContent(progressData, baseData, oldVersion, newVersion) {
+    if (!progressData || progressData.length === 0) return progressData;
+    
+    // 1. 직접 UID 매칭 (성공률 높음)
+    const directMatches = progressData.filter(p => baseData.find(b => b.uid === p.uid));
+    
+    if (directMatches.length === progressData.length) {
+        // 모든 진행 정보가 새 콘텐츠에서 찾음 → 성공
+        console.log(`[Version Migration] Direct UID match successful: ${progressData.length} items preserved`);
+        return progressData;
+    }
+    
+    console.warn(`[Version Migration] UID mismatch detected: v${oldVersion} → v${newVersion}`);
+    console.warn(`  - Found: ${directMatches.length}/${progressData.length}`);
+    console.warn(`  - Lost: ${progressData.length - directMatches.length} items - attempting recovery...`);
+    
+    // 2. 매칭되지 않은 진행 정보 보존 시도 (script_korean + chapter 기반)
+    const unmatchedProgress = progressData.filter(p => !baseData.find(b => b.uid === p.uid));
+    const recoveredMatches = [];
+    
+    unmatchedProgress.forEach(oldP => {
+        // chapter + script_korean 기반 매칭 시도
+        const oldChapter = oldP.chapter_name || oldP.chapter_orig;
+        const oldScript = oldP.script_korean;
+        
+        // 같은 chapter에서 같은 script_korean을 찾기
+        let matchedItem = baseData.find(b => 
+            (b.chapter_name === oldChapter || b.chapter_orig === oldChapter) &&
+            b.script_korean === oldScript &&
+            !directMatches.find(dm => dm.uid === b.uid) &&  // 아직 매칭 안 된 항목
+            !recoveredMatches.find(rm => rm.uid === b.uid)  // 중복 매칭 방지
+        );
+        
+        // 없으면 같은 chapter에서 위치 기반 매칭
+        if (!matchedItem) {
+            const chapterItems = baseData.filter(b => 
+                (b.chapter_name === oldChapter || b.chapter_orig === oldChapter) &&
+                !directMatches.find(dm => dm.uid === b.uid) &&
+                !recoveredMatches.find(rm => rm.uid === b.uid)
+            );
+            
+            if (chapterItems.length > 0) {
+                // 상대적 위치로 찾기 (같은 chapter 내 순서)
+                const oldChapterItems = progressData.filter(p => 
+                    (p.chapter_name === oldChapter || p.chapter_orig === oldChapter)
+                );
+                const oldIndex = oldChapterItems.indexOf(oldP);
+                
+                if (oldIndex >= 0 && oldIndex < chapterItems.length) {
+                    matchedItem = chapterItems[oldIndex];
+                }
+            }
+        }
+        
+        if (matchedItem) {
+            // 진행 정보의 UID를 새 항목의 UID로 업데이트
+            const recoveredP = { ...oldP, uid: matchedItem.uid };
+            recoveredMatches.push(recoveredP);
+            console.log(`  [Recovered by script] Ch:${oldChapter} → uid: ${matchedItem.uid}`);
+        }
+    });
+    
+    const allMatches = [...directMatches, ...recoveredMatches];
+    console.log(`[Version Migration] Final result: ${allMatches.length}/${progressData.length} items recovered`);
+    
+    if (allMatches.length < progressData.length) {
+        console.warn(`  ⚠️ Warning: ${progressData.length - allMatches.length} items could not be recovered`);
+        console.warn(`  - Check if content structure changed significantly (new UID scheme)`);
+    }
+    
+    return allMatches;
+}
+
+async function findPreviousStudySaveData(user) {
+    const rootSnapshot = await firebase.database().ref(`users/${user.uid}`).once('value');
+    const rootData = rootSnapshot.val();
+    if (!rootData) return null;
+
+    // progress에서 먼저 확인
+    if (rootData.progress && Array.isArray(rootData.progress) && rootData.progress.length > 0) {
+        return {
+            progress: rootData.progress,
+            myChapterInfo: rootData.myChapterInfo
+        };
+    }
+
+    // fallback: 기존 studySaveName 형식에서 찾기
+    const candidateKeys = Object.keys(rootData)
+        .filter(key => key !== studySaveName && /^ForeignSpeaking-v\d+$/.test(key) && rootData[key] && rootData[key].myChapterInfo);
+
+    if (candidateKeys.length === 0) return null;
+
+    candidateKeys.sort((a, b) => {
+        const versionA = parseInt(a.replace('ForeignSpeaking-v', ''), 10) || 0;
+        const versionB = parseInt(b.replace('ForeignSpeaking-v', ''), 10) || 0;
+        return versionB - versionA;
+    });
+
+    return rootData[candidateKeys[0]];
 }
 
 // Firebase에서 불러오기 
@@ -1127,8 +1337,23 @@ async function loadFromFirebase() {
     }
 
     let remoteData = null;
-    const snapshot = await firebase.database().ref(`users/${user.uid}/${studySaveName}`).once('value');
+    const snapshot = await firebase.database().ref(`users/${user.uid}`).once('value');
     remoteData = snapshot.val();
+
+    let previousVersion = null;
+    if (!remoteData || !remoteData.myChapterInfo) {
+        // 다른 버전에서 저장된 진행 이력이 있는지 확인
+        const previousData = await findPreviousStudySaveData(user);
+        if (previousData && previousData.myChapterInfo) {
+            remoteData = previousData;
+            previousVersion = previousData.myChapterInfo.studyDataVersion || previousData.myChapterInfo.currentVersion;
+        }
+    } else if (remoteData.myChapterInfo) {
+        previousVersion = remoteData.myChapterInfo.studyDataVersion || remoteData.myChapterInfo.currentVersion;
+    }
+
+    // 콘텐츠 업데이트 (버전 비교)
+    await updateSharedStudyContentIfNeeded(previousVersion);
 
     if (!remoteData || !remoteData.myChapterInfo) {
         // DB에 저장된 정보가 없으면 초기화
@@ -1139,12 +1364,12 @@ async function loadFromFirebase() {
     myChapterInfo = remoteData.myChapterInfo;
     
     currChapterName = myChapterInfo.currChapterName;
-    currBookName = myChapterInfo.currBookName; // 저장된 북 ID 복원
+    currBookName = myChapterInfo.currBookName;
     // 기본 인덱스 로드 (UID 매칭 실패 시 대비)
     let savedIndex = myChapterInfo.currStudyDataNum;
     defaultFontSize = myChapterInfo.defaultFontSize;
     defaultDevideNum = myChapterInfo.defaultDevideNum;
-    script_foreign_Font = myChapterInfo.script_foreign_Font || (defaultFontSize + 4); // 저장된 값이 없으면 기본 오프셋 적용
+    script_foreign_Font = myChapterInfo.script_foreign_Font || (defaultFontSize + 4);
     defaultPlayCount = myChapterInfo.defaultPlayCount;
     koreaPlay = myChapterInfo.koreaPlay;
     composeMode = myChapterInfo.composeMode;
@@ -1156,15 +1381,42 @@ async function loadFromFirebase() {
     mp3PlayMode = myChapterInfo.mp3PlayMode;
     foreignFirst = myChapterInfo.foreignFirst;
     forNoSoundLength = myChapterInfo.forNoSoundLength;
-    studyDataVersion = myChapterInfo.studyDataVersion;
+    studyDataVersion = myChapterInfo.studyDataVersion || myChapterInfo.currentVersion;
 
-    // Study Data 가져오기 (Base data fetch + progress data merge)
-    const baseDataResponse = await fetch(studyFileName);
-    const baseData = await baseDataResponse.json();
-
-    const progressData = remoteData.studyData || [];
+    // Study Data 가져오기 (공용 콘텐츠 + 사용자 진행 병합)
+    const baseData = await loadStudyContent();
+    let progressData = remoteData.progress || remoteData.studyProgress || remoteData.studyData || [];
+    
+    // 버전이 변경된 경우, UID 마이그레이션 시도
+    const oldVersion = previousVersion?.match(/-v(\d+\.\d+)\.json/)?.[1] || 'unknown';
+    const newVersion = studyFileName.match(/-v(\d+\.\d+)\.json/)?.[1] || 'unknown';
+    
+    if (oldVersion !== newVersion && progressData.length > 0) {
+        console.log(`[Version Check] Old: v${oldVersion} → New: v${newVersion}`);
+        
+        // 1단계: UID 마이그레이션 맵이 있으면 우선 적용
+        const migrationMap = CONFIG.UID_MIGRATION_MAP?.[`v${oldVersion}`];
+        if (migrationMap && Object.keys(migrationMap).length > 0) {
+            console.log(`[Migration Map] Applying manual UID mapping for v${oldVersion}`);
+            progressData = progressData.map(p => {
+                if (migrationMap[p.uid]) {
+                    console.log(`  ${p.uid} → ${migrationMap[p.uid]}`);
+                    return { ...p, uid: migrationMap[p.uid] };
+                }
+                return p;
+            });
+        }
+        
+        // 2단계: 자동 UID 매칭 (매핑되지 않은 항목 복구)
+        progressData = matchProgressToNewContent(progressData, baseData, oldVersion, newVersion);
+    }
 
     studyData = baseData.map(baseItem => {
+        // 삭제된 항목 스킵
+        if (baseItem.isDeleted) {
+            return null;
+        }
+        
         const progress = progressData.find(p => p.uid === baseItem.uid);
         if (progress) {
             // 학습 정보(진행 상황)만 유지하고 JSON 파일의 변경사항 반영
@@ -1172,7 +1424,8 @@ async function loadFromFirebase() {
                 finish: progress.finish,
                 finish_date: progress.finish_date,
                 test_count: progress.test_count,
-                group: progress.group
+                group: progress.group,
+                lastModified: progress.lastModified  // 타임스탐프 유지
             };
             return { ...baseItem, ...progressInfo };
         }
@@ -1181,11 +1434,11 @@ async function loadFromFirebase() {
             ...baseItem,
             finish: "no",
             finish_date: "",
-            group: 1, // [보완] 기본 그룹 번호를 1로 설정
+            group: 1,
             test_count: 0,
-            chapter_orig: baseItem.chapter_name // [수정] chapter_name 기준으로 초기화
+            chapter_orig: baseItem.chapter_name
         };
-    });
+    }).filter(item => item !== null);  // 삭제된 항목 필터링
 
     if (myChapterInfo.currStudyUid) {
         const foundIndex = studyData.findIndex(i => i.uid === myChapterInfo.currStudyUid);
@@ -1198,27 +1451,138 @@ async function loadFromFirebase() {
         currGroupNum = parseInt(studyData[currStudyDataNum].group) || 1;
     }
     
-    // Firebase 경로에서 Chapter List 가져오기
+    // Firebase 경로에서 Chapter List 가져오기 (새 구조에 맞게)
     myChapterList = remoteData.books?.[currBookName]?.myChapterList || {};
 
-    await checkChapter(); // 저장소 로드 후 챕터 목록 갱신
+    await checkChapter();
     if (myChapterList && myChapterList[currChapterName]) {
-        totalGroupCount = myChapterList[currChapterName].totalGroupCount;;
+        totalGroupCount = myChapterList[currChapterName].totalGroupCount;
         groupDevideNum = myChapterList[currChapterName].groupDevideNum;
         lastGroupMemberCount = myChapterList[currChapterName].lastGroupMemberCount;
         chapterStudyFinishDate = myChapterList[currChapterName].finishDates;
     }
 
-    yesCountInChapter = countYesInChapter(currChapterName); 
-    yesNoCountInChapter = countYesNoInChapter(currChapterName); 
-    findGroupMember(currGroupNum, currStudyDataNum);  // 저장된 그룹과 번호의 정보를 가져온다.
-    loadValue(currStudyDataNum); // 현재 값을 값을 로드 한다.  
-    // json 파일에서 language 정보를 가져온다. 
+    yesCountInChapter = countYesInChapter(currChapterName);
+    yesNoCountInChapter = countYesNoInChapter(currChapterName);
+    findGroupMember(currGroupNum, currStudyDataNum);
+    loadValue(currStudyDataNum);
     if (studyData.length > 0 && studyData[0].language) {
         studyLang = studyData[0].language;
     }
-    findDateStudyState();  // 일자별 공부 현황 Load 하기 
-    changeFontSize(defaultFontSize); // 변경된 폰트 사이즈로 폰트크기 재 설정하기 
+    findDateStudyState();
+    changeFontSize(defaultFontSize);
+}
+
+// =====================================================================
+// 버전 호환성 및 데이터 마이그레이션 함수들
+// =====================================================================
+
+// 버전 간 콘텐츠 호환성 검증 (UID 매핑)
+async function validateVersionCompatibility(oldVersion, newVersion, progressData) {
+    try {
+        // 새 콘텐츠 로드
+        const newContentResponse = await fetch(newVersion);
+        const newContent = await newContentResponse.json();
+        
+        // 진행 정보와 새 콘텐츠의 UID 매핑 검증
+        const validProgress = progressData.filter(p => 
+            newContent.find(item => item.uid === p.uid && !item.isDeleted)
+        );
+        
+        console.log(`Version compatibility check: ${progressData.length} items -> ${validProgress.length} valid items`);
+        return validProgress;
+    } catch (error) {
+        console.error("Version compatibility check failed:", error);
+        return progressData;  // fallback: 원본 데이터 반환
+    }
+}
+
+// 타임스탬프 기반 충돌 해결 (멀티디바이스 동시 업데이트)
+function resolveConflict(localProgress, remoteProgress) {
+    const localTime = localProgress.lastModified || 0;
+    const remoteTime = remoteProgress.lastModified || 0;
+    
+    // 최신 타임스탬프가 우선
+    if (remoteTime > localTime) {
+        return remoteProgress;
+    }
+    return localProgress;
+}
+
+// 구 데이터 구조에서 신 데이터 구조로 마이그레이션
+async function migrateOldUserData(user) {
+    const db = firebase.database();
+    const userRef = db.ref(`users/${user.uid}`);
+    const snapshot = await userRef.once('value');
+    const userData = snapshot.val();
+    
+    if (!userData) return false;
+    
+    // 이미 새 구조로 마이그레이션되었는지 확인
+    if (userData.progress) {
+        console.log("User data already migrated to new structure");
+        return true;
+    }
+    
+    // 구 구조에서 진행 정보 추출
+    let migratedProgress = [];
+    let migratedMyChapterInfo = null;
+    let migratedBooks = {};
+    
+    // 버전별 디렉토리 찾기 (ForeignSpeaking-v06 등)
+    for (const [key, value] of Object.entries(userData)) {
+        if (/^ForeignSpeaking-v\d+$/.test(key) && value.myChapterInfo) {
+            // studyProgress 또는 studyData에서 진행 정보 추출
+            const progressFromOldStructure = value.studyProgress || value.studyData || [];
+            
+            // 최신 정보 유지
+            if (!migratedMyChapterInfo || 
+                (value.myChapterInfo.lastSyncTimestamp && 
+                 (!migratedMyChapterInfo.lastSyncTimestamp || 
+                  value.myChapterInfo.lastSyncTimestamp > migratedMyChapterInfo.lastSyncTimestamp))) {
+                migratedMyChapterInfo = value.myChapterInfo;
+                migratedBooks = value.books || {};
+            }
+            
+            // 진행 정보 병합 (충돌 해결)
+            progressFromOldStructure.forEach(oldProgress => {
+                const existingIndex = migratedProgress.findIndex(p => p.uid === oldProgress.uid);
+                if (existingIndex === -1) {
+                    migratedProgress.push(oldProgress);
+                } else {
+                    // 충돌 시 최신 정보 유지
+                    migratedProgress[existingIndex] = resolveConflict(
+                        migratedProgress[existingIndex],
+                        oldProgress
+                    );
+                }
+            });
+        }
+    }
+    
+    // 새 구조로 저장
+    if (migratedProgress.length > 0 || migratedMyChapterInfo) {
+        const migrationUpdate = {};
+        if (migratedProgress.length > 0) {
+            migrationUpdate.progress = migratedProgress;
+        }
+        if (migratedMyChapterInfo) {
+            migrationUpdate.myChapterInfo = {
+                ...migratedMyChapterInfo,
+                migrationTimestamp: Date.now(),
+                migrated: true
+            };
+        }
+        if (Object.keys(migratedBooks).length > 0) {
+            migrationUpdate.books = migratedBooks;
+        }
+        
+        await userRef.update(migrationUpdate);
+        console.log("User data migrated successfully");
+        return true;
+    }
+    
+    return false;
 }
 
 // =====================================================================

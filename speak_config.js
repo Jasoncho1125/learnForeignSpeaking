@@ -12,13 +12,28 @@ function getStudySaveName(studyFileName) {
     return 'ForeignSpeaking'; // 기본값
 }
 
+// UID 마이그레이션 맵: 버전 변경 시 이전 UID를 새 UID로 매핑
+// 콘텐츠 구조가 크게 변경되었을 때만 사용
+// 예: { old_uid_1: 'new_uid_1', old_uid_2: 'new_uid_2' }
+const UID_MIGRATION_MAP = {
+    // "v0.9": {
+    //     "old_uid_pattern_1": "new_uid_pattern_1"
+    // },
+    // "v1.0": {
+    //     "old_uid_v0.9_item1": "new_uid_v1.0_item1"
+    // }
+};
+
 const CONFIG = {
     savePageTitle: "Foreign Speaking",
-    studyFileName: 'studySpeakingData-v0.9.json',
+    studyFileName: 'studySpeakingData-v1.0.json',
     get studySaveName() {
         return getStudySaveName(this.studyFileName);
     },
-    version: "v0.17",
+    version: "v0.18",
+    
+    // UID 마이그레이션 맵 참조
+    UID_MIGRATION_MAP: UID_MIGRATION_MAP,
 
     // 사전 연동 정보 (language -> 사전 URL 기본 경로)
     DICTIONARIES: {
