@@ -490,7 +490,7 @@ document.addEventListener('DOMContentLoaded', function () {
         event.preventDefault();
     }, { passive: false });
 
-    touchArea.addEventListener('click', function () {
+    touchArea.addEventListener('click', async function () {
         const currentTime = new Date().getTime();
         const tapInterval = currentTime - lastTapTime;
         lastTapTime = currentTime;
@@ -505,7 +505,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         // 1곡 반복중에는 아무것도 안함.
                     } else {
                         if(btnPlayOne.textContent != "STOP"){
-                            timeOut = setTimeout("playMp3B()", 500);
+                            timeOut = setTimeout(playMp3B, 500);
                         } else {
                             myAudio.pause();
                             myAudio.currentTime = 0;
@@ -521,15 +521,20 @@ document.addEventListener('DOMContentLoaded', function () {
         switch (numClicks) {
             case 2:
                 if (btnPlayRepeat.textContent == "STOP") {
+                    // 반복 재생 중에는 완료 처리만 수행
+                    await changeToYes();
                 } else if (btnPlayOne.textContent == "STOP") {
                     myAudio.pause();
                     myAudio.currentTime = 0;
                     isPlaying = false;
                     btnPlayOne.textContent = "PLAY";
-                    changeToYes();
+                    await changeToYes();
                 } else {
-                    changeToYes();
-                    timeOut = setTimeout("playMp3B()", 500);
+                    await changeToYes();
+                    // 마지막 항목 완료 후에는 자동 재생하지 않음
+                    if (countNoInChapter(currChapterName) > 0) {
+                        timeOut = setTimeout(playMp3B, 500);
+                    }
                 }
                 numClicks = 0;
                 break;

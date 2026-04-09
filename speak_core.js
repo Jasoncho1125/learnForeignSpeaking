@@ -382,6 +382,9 @@ function updateBasicStudyData(){
 
 // 현재 변경된 상태를 반영하여 화면에 정보를 다시 표시해 준다. 
 function loadValue(currStudyDataNum) {
+    // 책 변경 시 이전 완료 메시지 초기화
+    document.getElementById('finishComment').innerHTML = "";
+    
     const item = studyData ? studyData[currStudyDataNum] : null;
     if (!item) {
         if (currChapterName && countNoInChapter(currChapterName) === 0) finishAllComment();
