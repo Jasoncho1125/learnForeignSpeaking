@@ -1010,9 +1010,15 @@ function finishAllComment() {
     
     let finishMessage = `"축하합니다. 당신은 ${currChapterName} Chapter에서 총 ${countAllInChapter(currChapterName)}개 중 ${countDeleteInChapter(currChapterName)}개를 삭제 완료하고,  ${countYesInChapter(currChapterName)}개의 단어(문장)을 모두 암기 했습니다."`;
     document.getElementById('script_korean').innerHTML = finishMessage;
+    document.getElementById('script_foreign').innerHTML = "";
+    document.getElementById('pronounce').innerHTML = "";
+    document.getElementById('explain').innerHTML = "";
+    document.getElementById('script_korean_llm').innerHTML = "";
+    hideImage();
+    document.getElementById("show-audio-controller").style.display = "none";
 
     //totalGroupCount = 0; // 모두 완료한 경우에 0으로 설정함
-    countYesInChapter(currChapterName) // 현재 챕터의 finish 횟수 다시 세기. 
+    countYesInChapter(currChapterName); // 현재 챕터의 finish 횟수 다시 세기.
     saveToFirebase();
 }
 
@@ -1027,6 +1033,8 @@ function finishGroupComment() {
     document.getElementById('pronounce').innerHTML = "";
     document.getElementById('explain').innerHTML = "";
     document.getElementById('script_korean_llm').innerHTML = "";
+    hideImage();
+    document.getElementById("show-audio-controller").style.display = "none";
     updateProgress(100);
     showCurrStudyBar(-1); // 바 초기화
 }
@@ -1044,6 +1052,12 @@ function deleteAllComment() {
     
     let finishMessage = `"${currChapterName}" Chapter의 총 ${countAllInChapter(currChapterName)} 개의 단어(문장)을 모두 삭제 완료 했습니다. 초기화 후 이용해 주세요.`;
     document.getElementById('script_korean').innerHTML = finishMessage;
+    document.getElementById('script_foreign').innerHTML = "";
+    document.getElementById('pronounce').innerHTML = "";
+    document.getElementById('explain').innerHTML = "";
+    document.getElementById('script_korean_llm').innerHTML = "";
+    hideImage();
+    document.getElementById("show-audio-controller").style.display = "none";
 
     //totalGroupCount = 0; // 모두 완료한 경우에 0으로 설정함
     countYesInChapter(currChapterName) // 현재 챕터의 finish 횟수 다시 세기. 

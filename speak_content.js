@@ -97,7 +97,7 @@ async function changeBook() {
         const user = firebase.auth().currentUser;
         if (user) {
             const snapshot = await firebase.database()
-                .ref(`users/${user.uid}/${CONFIG.studySaveName}/books/${currBookName}/myChapterList`)
+                .ref(`users/${user.uid}/books/${currBookName}/myChapterList`)
                 .once('value');
             myChapterList = snapshot.val() || {};
         }
@@ -324,11 +324,20 @@ function countFinishDates(chapter) {
 async function selectChapter() {
     return new Promise((resolve) => {
         // 현재 선택된 Book의 챕터들만 필터링하여 보여주도록 개선
-        const currentBookName = studyData[currStudyDataNum].book_name;
+        const currentBookName = (studyData && studyData[currStudyDataNum] && studyData[currStudyDataNum].book_name) ? studyData[currStudyDataNum].book_name : currBookName;
         let filteredChapters = new Set();
-        studyData.forEach(item => {
-            if(item.book_name === currentBookName) filteredChapters.add(item.chapter_name);
-        });
+
+        if (currentBookName) {
+            studyData.forEach(item => {
+                if (item.book_name === currentBookName) filteredChapters.add(item.chapter_name);
+            });
+        }
+        // currentBookName이 없거나 필터 결과가 비어 있으면 전체 챕터 목록 사용
+        if (filteredChapters.size === 0) {
+            studyData.forEach(item => {
+                if (item.chapter_name) filteredChapters.add(item.chapter_name);
+            });
+        }
         const displayChapters = [...filteredChapters];
 
         let radioButtonsHtml = displayChapters.map((chapter) => {
@@ -472,7 +481,7 @@ async function selectChapter2() {
 function showChapterStatus() {
     if (!studyData || studyData[currStudyDataNum] === undefined) return;
 
-    const currentBook = studyData[currStudyDataNum].book;
+    const currentBook = studyData[currStudyDataNum].book_name || studyData[currStudyDataNum].book || currBookName;
     let bookTotal = 0;
     let bookDelete = 0;
     let bookFinish = 0;
