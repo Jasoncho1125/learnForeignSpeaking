@@ -371,14 +371,19 @@ span.mychaptercolor {
 }
 
 #image-container {
-  width: 100%; /* Ensures the container takes up the full width of the screen */
-  overflow: hidden; /* Hides any overflow from the image */
+  width: 100%;
+  overflow: hidden;
+  display: none;
+  margin-top: 10px;
+  text-align: center;
 }
 
 #image {
-  width: 100%; /* Ensures the image takes up the full width of the container */
-  height: auto; /* Maintains the aspect ratio of the image */
+  max-width: 100%;
+  height: auto;
   display: block;
+  margin: 0 auto;
+  border-radius: 8px;
 }
 
 /* 팝업창을 위한 css 정의 */
