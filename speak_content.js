@@ -51,7 +51,6 @@ function myChapterListInfoMake() {
                 'totalGroupCount': 0,
                 'currGroupNum': 0,
                 'groupDevideNum': 5000, 
-                'finishDates' : "",
                 'lastGroupMemberCount': 0
             };
         }
@@ -100,6 +99,14 @@ async function changeBook() {
                 .ref(`users/${user.uid}/books/${currBookName}/myChapterList`)
                 .once('value');
             myChapterList = snapshot.val() || {};
+            
+            // 호환성: 새 경로에 데이터가 없으면 이전 경로에서 불러오기
+            if (!snapshot.val()) {
+                const oldSnapshot = await firebase.database().ref(`users/${user.uid}/myChapterList`).once('value');
+                if (oldSnapshot.val()) {
+                    myChapterList = oldSnapshot.val();
+                }
+            }
         }
 
         // [수정] UID 히스토리를 확인하여 정확한 인덱스 찾기
@@ -231,7 +238,6 @@ async function changeChapter() {
                 'lastStudyNumInChapter': 0,
                 'yesNoCountInChapter': 0,
                 'totalGroupCount': 0,
-                'finishDates': "",
                 'groupDevideNum': 10
             };
         }
@@ -392,8 +398,45 @@ async function selectChapter() {
                     selectedChapter = radio.value;
                 }
             });
-            modal.remove();
-            resolve(selectedChapter);
+            if (selectedChapter !== "cancel") {
+                const finishCount = countFinishDates(selectedChapter);
+                if (finishCount > 0) {
+                    // 이미 완료된 챕터인 경우 초기화 팝업 표시
+                    const resetModalHtml = `
+                        <div id="resetChapterModalOverlay" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); display: flex; justify-content: center; align-items: center; z-index: 3000; padding: 20px;">
+                            <div style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); width: 100%; max-width: 400px;">
+                                <p style="font-weight: bold; margin-bottom: 15px;">이미 학습 완료한 Chapter입니다. 초기화 하시겠습니까?(삭제 컨텐츠는 유지)</p>
+                                <div class="button-container" style="display: flex; justify-content: center; gap: 10px;">
+                                    <button id="resetConfirm" class="button4ea btn_color2">확인</button>
+                                    <button id="resetCancel" class="button4ea btn_color2">취소</button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    document.body.insertAdjacentHTML('beforeend', resetModalHtml);
+                    const resetModal = document.getElementById('resetChapterModalOverlay');
+                    const resetConfirm = document.getElementById('resetConfirm');
+                    const resetCancel = document.getElementById('resetCancel');
+                    resetConfirm.addEventListener('click', () => {
+                        initializeChapter(selectedChapter, 3);
+                        resetModal.remove();
+                        modal.remove();
+                        resolve(selectedChapter);
+                    });
+                    resetCancel.addEventListener('click', () => {
+                        showPopup(" 이미 학습 완료한 Chapter입니다. 초기화 후에 학습 진행해 주세요");
+                        resetModal.remove();
+                        modal.remove();
+                        resolve("cancel");
+                    });
+                } else {
+                    modal.remove();
+                    resolve(selectedChapter);
+                }
+            } else {
+                modal.remove();
+                resolve("cancel");
+            }
         });
 
         cancelButton.addEventListener('click', () => {
