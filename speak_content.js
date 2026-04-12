@@ -182,7 +182,7 @@ async function selectBook() {
 
         const modalHtml = `
             <div id="selectBookModalOverlay" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); display: flex; justify-content: center; align-items: center; z-index: 2000;">
-                <div style="background: white; padding: 20px; border-radius: 8px; width: 100%; max-width: 320px; max-height: calc(100vh - 40px); display: flex; flex-direction: column; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); margin: 20px;">
+                <div style="background: white; padding: 20px; border-radius: 8px; width: 100%; max-width: 320px; max-height: 60vh; display: flex; flex-direction: column; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); margin: 20px;">
                     <p style="font-weight: bold; margin-bottom: 15px; flex-shrink: 0;">공부할 Book을 선택하세요</p>
                     <div style="overflow-y: auto; flex: 1; margin-bottom: 15px;">
                         ${radioButtonsHtml}
@@ -364,14 +364,14 @@ async function selectChapter() {
             return `
                 <label style="color: ${labelColor}; display: block; margin-bottom: 10px;">
                     <input type="radio" name="chapter" value="${chapter}" ${isChecked}>
-                    ${chapter}(전체완료 : ${finishCount}회, 암기대상 : ${countNoInChapter(chapter)}개)
+                    ${chapter}(완료 : ${finishCount}회, 대상 : ${countNoInChapter(chapter)}개)
                 </label>
             `;
         }).join('');
 
         const modalHtml = `
             <div id="selectChapterModalOverlay" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); display: flex; justify-content: center; align-items: center; z-index: 2000;">
-                <div style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); width: 100%; max-width: 400px; max-height: calc(100vh - 40px); display: flex; flex-direction: column; margin: 20px;">
+                <div style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); width: 100%; max-width: 400px; max-height: 60vh; display: flex; flex-direction: column; margin: 20px;">
                     <p style="font-weight: bold; margin-bottom: 15px; flex-shrink: 0;">공부하려는 Chapter을 선택하세요</p>
                     <div style="overflow-y: auto; flex: 1; margin-bottom: 15px;">
                         ${radioButtonsHtml}
@@ -485,7 +485,7 @@ async function selectChapter2() {
                     return `
                         <label style="color: ${labelColor};">
                             <input style="margin-bottom: 10px" type="radio" name="chapter" value="${chapter}" onclick="confirmSelection('${chapter}')">
-                            ${chapter}(전체완료 : ${finishCount}회, 암기대상 : ${countYesNoInChapter(chapter)}개)
+                            ${chapter}(완료 : ${finishCount}회, 대상 : ${countYesNoInChapter(chapter)}개)
                         </label><br>
                     `;
                 }).join('')}
