@@ -30,7 +30,7 @@ const CONFIG = {
     get studySaveName() {
         return getStudySaveName(this.studyFileName);
     },
-    version: "v0.20",
+    version: "v0.21",
     
     // UID 마이그레이션 맵 참조
     UID_MIGRATION_MAP: UID_MIGRATION_MAP,
