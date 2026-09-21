@@ -405,6 +405,16 @@ function loadValue(currStudyDataNum) {
     
     document.getElementById('study_title').innerHTML = displayTitle;
 
+    // [수정] 현재 로드된 아이템의 소속 그룹 번호를 전역 변수(currGroupNum)에 즉시 동기화합니다.
+    // 이를 통해 "GroupNo : 현재/전체" 표시에서 현재 번호가 전체 번호와 동일하게 고정되는 현상을 해결합니다.
+    if (item && item.group) {
+        const itemGroup = parseInt(item.group);
+        if (!isNaN(itemGroup) && itemGroup > 0) {
+            currGroupNum = itemGroup;
+        }
+    }
+    if (!currGroupNum || isNaN(currGroupNum)) currGroupNum = 1;
+
     // [수정] totalGroupCount가 null, 0, NaN인 경우 현재 데이터에서 다시 계산하여 복구합니다.
     if (!totalGroupCount || isNaN(totalGroupCount) || totalGroupCount == 0) {
         if (myChapterList[currChapterName] && myChapterList[currChapterName].totalGroupCount > 0) {
@@ -413,14 +423,18 @@ function loadValue(currStudyDataNum) {
             // myChapterList에도 정보가 없다면 studyData에서 직접 최대 그룹 번호를 찾습니다.
             let maxGroupFound = 0;
             for (let i = 0; i < studyData.length; i++) {
-                if (studyData[i].book_name === currBookName && studyData[i].chapter_name === currChapterName) {
+                if (studyData[i].book_name === currBookName && 
+                    (studyData[i].chapter_name === currChapterName || studyData[i].chapter === currChapterName)) {
                     let g = parseInt(studyData[i].group);
                     if (!isNaN(g) && g > maxGroupFound) maxGroupFound = g;
                 }
             }
-            totalGroupCount = maxGroupFound;
+            totalGroupCount = maxGroupFound > 0 ? maxGroupFound : 1;
         }
     }
+
+    // [추가] 현재 그룹의 미완료 멤버 수(noCountInGroup)를 실제 배열 크기와 동기화합니다.
+    noCountInGroup = currGroupMemberArr.length;
 
     // 그룹 표시 : 삭제는 제외하고 표출한다. 
     if(currGroupMemberArr.length === 0){

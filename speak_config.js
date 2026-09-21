@@ -26,11 +26,11 @@ const UID_MIGRATION_MAP = {
 
 const CONFIG = {
     savePageTitle: "Foreign Speaking",
-    studyFileName: 'studySpeakingData-v1.2.json',
+    studyFileName: 'studySpeakingData-v1.4.json',
     get studySaveName() {
         return getStudySaveName(this.studyFileName);
     },
-    version: "v0.25",
+    version: "v0.27",
     
     // UID 마이그레이션 맵 참조
     UID_MIGRATION_MAP: UID_MIGRATION_MAP,
